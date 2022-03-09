@@ -1,0 +1,15 @@
+version: "2"
+
+services:
+
+  python-backend:
+    build:
+      context: ./air-quality-lorawan
+    image: python:3.8
+    container_name: air-quality-python-backend
+    ports:
+      - 1885:1885
+    volumes:
+      - ./configuration/python-backend/:/app/config
+      - ./air-quality-lorawan:/app
+    restart: unless-stopped

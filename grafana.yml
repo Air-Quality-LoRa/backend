@@ -1,0 +1,27 @@
+# Copyright (C) CampusIoT,  - All Rights Reserved
+# Written by CampusIoT Dev Team, 2016-2020
+
+version: "2"
+
+services:
+
+# http://docs.grafana.org/installation/docker/
+  grafana:
+    image: grafana/grafana
+    container_name: air-quality-grafana
+#    build:
+#      context: ./docker/grafana
+#    image: campusiot/grafana:latest
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: __SUPER_SECRET_TO_CHANGE__
+      #GF_SERVER_ROOT_URL: http://grafana.server.name
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource,grafana-worldmap-panel,grafana-piechart-panel,mtanda-heatmap-epoch-panel,briangann-gauge-panel,jdbranham-diagram-panel,snuids-radar-panel,fatcloud-windrose-panel,snuids-trafficlights-panel,larona-epict-panel,grafana-polystat-panel,natel-plotly-panel,bessler-pictureit-panel,pierosavi-imageit-panel,agenty-flowcharting-panel,abhisant-druid-datasource,https://github.com/gapitio/gapit-htmlgraphics-panel/releases/download/v2.0.2/gapit-htmlgraphics-panel-2.0.2.zip;gapit-htmlgraphics-panel,https://github.com/cloudspout/cloudspout-button-panel/releases/download/7.0.23/cloudspout-button-panel.zip;cloudspout-button-panel
+    volumes:
+       - ./configuration/grafana/grafana.ini:/etc/grafana/grafana.ini
+       - ./configuration/grafana/dashboards/:/var/lib/grafana/dashboards/
+       - ./configuration/grafana/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+       - ./configuration/grafana/datasources/:/etc/grafana/provisioning/datasources/
+       - ./configuration/grafana/logo.svg:/usr/share/grafana/public/img/grafana_icon.svg
+    ports:
+      - 3000:3000
+    restart: unless-stopped

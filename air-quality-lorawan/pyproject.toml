@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "air-quality-backend"
+version = "0.1.0"
+description = ""
+authors = ["Bertrand Baudeur, Gilles Mertens"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+fastapi = "^0.75.0"
+paho-mqtt = "^1.6.1"
+influxdb = "^5.3.1"
+uvicorn = "^0.17.5"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
