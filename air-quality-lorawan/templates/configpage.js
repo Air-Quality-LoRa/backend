@@ -156,34 +156,34 @@ function sendConfig() {
     }
     let data = {
         "sf7" : {
-            "data_type" : document.getElementById("data_type_sf7").value,
-            "data_interval" : document.getElementById("data_interval_sf7").value,
-            "recovery_interval" : document.getElementById("recovery_interval_sf7").value
+            "data_type" : praseInt(document.getElementById("data_type_sf7").value),
+            "data_interval" : praseInt(document.getElementById("data_interval_sf7").value),
+            "recovery_interval" : praseInt(document.getElementById("recovery_interval_sf7").value)
         },
         "sf8" : {
-            "data_type" : document.getElementById("data_type_sf8").value,
-            "data_interval" : document.getElementById("data_interval_sf8").value,
-            "recovery_interval" : document.getElementById("recovery_interval_sf8").value
+            "data_type" : praseInt(document.getElementById("data_type_sf8").value),
+            "data_interval" : praseInt(document.getElementById("data_interval_sf8").value),
+            "recovery_interval" : praseInt(document.getElementById("recovery_interval_sf8").value)
         },
         "sf9" : {
-            "data_type" : document.getElementById("data_type_sf9").value,
-            "data_interval" : document.getElementById("data_interval_sf9").value,
-            "recovery_interval" : document.getElementById("recovery_interval_sf9").value
+            "data_type" : praseInt(document.getElementById("data_type_sf9").value),
+            "data_interval" : praseInt(document.getElementById("data_interval_sf9").value),
+            "recovery_interval" : praseInt(document.getElementById("recovery_interval_sf9").value)
         },
         "sf10" : {
-            "data_type" : document.getElementById("data_type_sf10").value,
-            "data_interval" : document.getElementById("data_interval_sf10").value,
-            "recovery_interval" : document.getElementById("recovery_interval_sf10").value
+            "data_type" : praseInt(document.getElementById("data_type_sf10").value),
+            "data_interval" : praseInt(document.getElementById("data_interval_sf10").value),
+            "recovery_interval" : praseInt(document.getElementById("recovery_interval_sf10").value)
         },
         "sf11" : {
-            "data_type" : document.getElementById("data_type_sf11").value,
-            "data_interval" : document.getElementById("data_interval_sf11").value,
-            "recovery_interval" : document.getElementById("recovery_interval_sf11").value
+            "data_type" : praseInt(document.getElementById("data_type_sf11").value),
+            "data_interval" : praseInt(document.getElementById("data_interval_sf11").value),
+            "recovery_interval" : praseInt(document.getElementById("recovery_interval_sf11").value)
         },
         "sf12" : {
-            "data_type" : document.getElementById("data_type_sf12").value,
-            "data_interval" : document.getElementById("data_interval_sf12").value,
-            "recovery_interval" : document.getElementById("recovery_interval_sf12").value
+            "data_type" : praseInt(document.getElementById("data_type_sf12").value),
+            "data_interval" : praseInt(document.getElementById("data_interval_sf12").value),
+            "recovery_interval" : praseInt(document.getElementById("recovery_interval_sf12").value)
         },
     };
     fetch(url="/api-backend/config_device",{
