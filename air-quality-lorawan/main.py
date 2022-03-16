@@ -5,13 +5,14 @@ import influxdb_client
 from influxdb_client.client.write_api import SYNCHRONOUS
 from datetime import datetime
 from http.server import HTTPServer, SimpleHTTPRequestHandler
-from jinja2 import Environment, FileSystemLoader, PackageLoader, select_autoescape
+from jinja2 import Environment, FileSystemLoader, Template, select_autoescape
+import configparser
 
 uplinkIntervalDict = {0:120,1:60,2:45,3:30,4:20,5:15,6:10,7:5}
 recoveryIntervalDict = {0:-1,1:2,2:4,3:8,4:16,5:32,6:64,7:128}
 
 devices = ["air-quality-station-test2"]
-uplinkTopicPrefix = "v3/air-quality-grenoble@ttn/devices/"
+uplinkTopicTemplate = "v3/{{username}}/devices/{{device}}/{{topic}}"
 uplinkTopics = ["up","down/queued","down/nack"]
 
 usernameMqttBroker = "air-quality-grenoble@ttn"
@@ -30,11 +31,43 @@ mqttBrokerClient = mqtt.Client()
 influxdbClient = influxdb_client.InfluxDBClient("http://"+influxdbAddress+":"+influxdbPort,token=influxdbToken,org=influxdbOrg)
 influxdbWriteApi = influxdbClient.write_api(write_options=SYNCHRONOUS)
 
-recoveryInterval = 4 #Number of message sent before a xor is sent
+configFile = configparser.ConfigParser()
 
-uplinkInterval = 10 #Minutes between two messages
+config = {  "sf7": {
+                "data_type": 1,
+                "data_interval": 5,
+                "data_recovery" : 2
+            },
+            "sf8": {
+                "data_type": 1,
+                "data_interval": 10,
+                "data_recovery" : 2
+            },
+            "sf9": {
+                "data_type": 1,
+                "data_interval": 15,
+                "data_recovery" : 2
+            },
+            "sf10": {
+                "data_type": 1,
+                "data_interval": 30,
+                "data_recovery" : 2
+            },
+            "sf11": {
+                "data_type": 1,
+                "data_interval": 60,
+                "data_recovery" : 2
+            },
+            "sf12": {
+                "data_type": 1,
+                "data_interval": 120,
+                "data_recovery" : 2
+            },
+}
 
-previousMessages = []
+lastSF = dict()
+
+previousMessages = dict()
 
 dateFormat= "%Y-%m-%dT%H:%M:%S.%f"
 
@@ -112,9 +145,10 @@ def on_connect(client, userdata, flags, rc):
 
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
+    template = Template(uplinkTopicTemplate)
     for device in devices:
         for topic in uplinkTopics:
-            client.subscribe(uplinkTopicPrefix + device + '/' + topic,2)
+            client.subscribe(template.render(username=usernameMqttBroker,device=device,topic=topic),2)
 
 def formatMsg(msg):
     formattedMsg = json.loads(msg.payload)
@@ -159,7 +193,7 @@ def storePreviousMessage(message):
     time = message["timestamp"]
     isValid = message["type"] in [2,3,4]
     previousMessages.insert([id,rawPayload,time,isValid])
-    if(len(previousMessages) > recoveryInterval+1):
+    if(len(previousMessages) > config[lastSF(message["device_id"])]["recovery_interval"]+1):
         previousMessages.pop()
 
 def xorPayload(a,b):
@@ -176,16 +210,16 @@ def xorPayload(a,b):
 def recoverMessage(message,id,missingIndex):
     xorMsg = message["raw_payload"]
     xorServ = []
-    for i in range(1,recoveryInterval):
-        xor = xorPayload(xor,previousMessages[i][1])
+    for i in range(1,config[lastSF[message["device_id"]]]["recovery_interval"]):
+        xor = xorPayload(xor,previousMessages[message["device_id"]][i][1])
     recoveredPayload = xorPayload(xorMsg,xorServ)
     timestamp = 0
     if(missingIndex == 1):
         timestamp = previousMessages[2][2]
-        timestamp += uplinkInterval*1000000*60 #add minute from previous message
+        timestamp += config[lastSF(message["device_id"])]["data_interval"]*1000000*60 #add minute from previous message
     else:
         timestamp = previousMessages[missingIndex-1][2]
-        timestamp -= uplinkInterval*1000000*60 #add minute from previous message
+        timestamp -= config[lastSF(message["device_id"])]["data_interval"]*1000000*60 #add minute from previous message
     recoveredMessage = {
         "message_id" : id,
         "device_id" : message["device_id"],
@@ -201,14 +235,14 @@ def recoverMessage(message,id,missingIndex):
     return recoveredMessage
 
 def handleRecover(message):
-    if(len(previousMessages) != recoveryInterval+1):
+    if(len(previousMessages) != config[lastSF(message["device_id"])]["recovery_interval"]+1):
         return 
     recoveryId = message["message_id"]
     nbJumps = 0
     previousNum = recoveryId
     missingId = 0
     missingIndex = 0
-    for i in range(1, recoveryInterval+1):
+    for i in range(1, config[lastSF(message["device_id"])]["recovery_interval"]+1):
         jump = (previousNum - previousMessages[i][0]) % 256 
         if(jump > 1):
             nbJumps += jump
@@ -263,11 +297,15 @@ env = Environment(
     autoescape=select_autoescape()
 )
 
-def handleDeviceConfig():
-    pass
+def handleDeviceConfig(data):
+    global config
+    config = data
 
-def handleAppConfig():
-    pass
+def handleAppConfig(data):
+    global usernameMqttBroker
+    global passwordMqttBroker
+    usernameMqttBroker = data["username"]
+    passwordMqttBroker = data["api-key"]
     #Change SQLIT
     #TODO
     #Restart mqtt

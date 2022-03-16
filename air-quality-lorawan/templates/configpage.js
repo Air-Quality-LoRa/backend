@@ -148,8 +148,10 @@ function checkAllFilled() {
 }
 
 function sendConfig() {
+    let error = document.getElementById("incomplete-error");
+    error.setAttribute("hidden","true");
     if(!checkAllFilled()) {
-        //afficher retour.
+        error.removeAttribute("hidden");
         return;
     }
     let data = {
