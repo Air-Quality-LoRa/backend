@@ -6,8 +6,8 @@ def setDeviceConfig(config):
     configuration["device_config"] = config
     saveConfig()
 
-def setDeviceIds(deviceIds:[]):
-    configuration["device_ids"] = device_ids
+def setDeviceIds(deviceIds):
+    configuration["device_ids"] = deviceIds
     saveConfig()
     
 def setMqttCredentials(username:str, key:str):
@@ -15,10 +15,10 @@ def setMqttCredentials(username:str, key:str):
     configuration["mqttUsername"] = username
     saveConfig()
 
-def getDeviceConfig(config):
+def getDeviceConfig():
     return configuration["device_config"]
 
-def getDeviceIds(deviceIds:[]):
+def getDeviceIds():
     return configuration["device_ids"]
  
     
