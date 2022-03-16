@@ -8,7 +8,6 @@ services:
 # http://docs.grafana.org/installation/docker/
   grafana:
     image: grafana/grafana
-    container_name: air-quality-grafana
 #    build:
 #      context: ./docker/grafana
 #    image: campusiot/grafana:latest

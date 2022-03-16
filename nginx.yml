@@ -3,7 +3,6 @@ version: '2'
 services:
   nginx:
     image: nginx:alpine
-    container_name: webserver
     restart: unless-stopped
     ports:
       - 80:80
