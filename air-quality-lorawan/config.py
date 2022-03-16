@@ -1,63 +1,38 @@
-import configparser
-import threading
+import json, os
 
-device_config = {  "sf7": {
-                "data_type": 1,
-                "data_interval": 5,
-                "data_recovery" : 2
-            },
-            "sf8": {
-                "data_type": 1,
-                "data_interval": 10,
-                "data_recovery" : 2
-            },
-            "sf9": {
-                "data_type": 1,
-                "data_interval": 15,
-                "data_recovery" : 2
-            },
-            "sf10": {
-                "data_type": 1,
-                "data_interval": 30,
-                "data_recovery" : 2
-            },
-            "sf11": {
-                "data_type": 1,
-                "data_interval": 60,
-                "data_recovery" : 2
-            },
-            "sf12": {
-                "data_type": 1,
-                "data_interval": 120,
-                "data_recovery" : 2
-            },
-}
-
-mqttUsername = ""
-mqttApiKey = ""
-
-device_ids = []
-
-configParser = configparser.ConfigParser()
-
-mutex = threading.Lock()
+configuration = dict()
 
 def setDeviceConfig(config):
-    global device_config
-    device_config = config
+    configuration["device_config"] = config
     saveConfig()
 
+def setDeviceIds(deviceIds:[]):
+    configuration["device_ids"] = device_ids
+    saveConfig()
+    
+def setMqttCredentials(username:str, key:str):
+    configuration["mqttApiKey"] = key
+    configuration["mqttUsername"] = username
+    saveConfig()
+
+def getDeviceConfig(config):
+    return configuration["device_config"]
+
+def getDeviceIds(deviceIds:[]):
+    return configuration["device_ids"]
+ 
+    
+def getMqttCredentials():
+    return (configuration["mqttUsername"], configuration["mqttApiKey"])
+
+
 def saveConfig():
-    global mutex
-    mutex.acquire()
-    mqtt = configParser['MQTT']
-    mqtt['username'] = mqttUsername
-    mqtt['apikey'] = mqttApiKey
-    devices = configParser['DEVICES']
-    devices['list'] = str(device_ids)
-    devices['config'] = device_config
-    
+    global configuration
+    with open('config.json.tmp', 'w') as f:
+        f.write(json.dumps(configuration))
+    os.replace('config.json.tmp', 'config.json')
 
-    mutex.release()
-
-    
+def loadConfig():
+    global configuration
+    with open('config.json', 'r') as f:
+        configuration = json.load(f)
