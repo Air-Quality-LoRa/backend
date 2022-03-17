@@ -1,16 +1,6 @@
-# Copyright (C) CampusIoT,  - All Rights Reserved
-# Written by CampusIoT Dev Team, 2016-2018
-
 version: "2"
 
 services:
-
-  # nodered:
-  #   extends:
-  #     file: nodered.yml
-  #     service: nodered
-  #   links:
-  #     - influxdb:influxdb
 
   influxdb:
     extends:
@@ -21,20 +11,20 @@ services:
     extends:
       file: grafana.yml
       service: grafana
-    links:
-      - influxdb:influxdb
+    depends_on:
+      - influxdb
 
   python-backend:
     extends:
       file: python-backend.yml
       service: python-backend
-    links:
-      - influxdb:influxdb
+    depends_on:
+      - influxdb
 
   nginx:
     extends:
       file: nginx.yml
       service: nginx
-    links:
-     - python-backend:python-backend
-     - grafana:grafana
+    depends_on:
+     - python-backend
+     - grafana

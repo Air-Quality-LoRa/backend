@@ -6,9 +6,17 @@ services:
     build:
       context: ./air-quality-lorawan
     image: python:3.8
+    environment:
+      INFLUXDB_ADDRESS: influxdb
+      INFLUXDB_PORT: 8086
+      INFLUXDB_USERNAME: admin
+      INFLUXDB_TOKEN: ${INFLUX_TOKEN}
+      INFLUXDB_ORG: ${INFLUX_ORG}
+      INFLUXDB_BUCKET: ${INFLUX_BUCKET}
+      
     ports:
       - 1885:1885
     volumes:
       - ./configuration/python-backend/:/app/config
-      - ./air-quality-lorawan:/app
+      # - ./air-quality-lorawan:/app
     restart: unless-stopped

@@ -9,6 +9,7 @@ from datetime import datetime
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from jinja2 import Environment, FileSystemLoader, Template, select_autoescape
 from config import *
+import os
 
 NOT_CONFIGURED = 0
 WAITING_ACK = 1
@@ -37,9 +38,9 @@ DOWNLINK_TOPIC_TEMPLATE = "v3/{{username}}/devices/{{device}}/down/replace"
 TTN_MQTT_BROKER_ADDRESS = "eu1.cloud.thethings.network"
 TTN_MQTT_BROKER_PORT = 1883
 
-influxdbAddress = "localhost"
-influxdbPort = "8086"
-influxdbUsername = "admin"
+influxdbAddress = "localhost" #os.environ["influxdbAddress"]
+influxdbPort = "8086" #os.environ["influxdbPort"]
+influxdbUsername = "admin" 
 influxdbToken = "o92Qd_sO34KKh7lj3AczKutxH5aZ8vTGytrud-iKu7FvA4bo-nvOj09g9SRGbFnitFi4XoG8Iri32_0DORhR7Q=="
 influxdbOrg = "f43170103778eb07"
 INFLUXDB_BUCKET = "air-quality"
