@@ -1,3 +1,4 @@
+from email import message
 import threading
 from time import sleep
 import paho.mqtt.client as mqtt
@@ -9,6 +10,8 @@ from datetime import datetime
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from jinja2 import Environment, FileSystemLoader, Template, select_autoescape
 from config import *
+
+DEBUG = True
 
 NOT_CONFIGURED = 0
 WAITING_ACK = 1
@@ -54,10 +57,12 @@ devicesStates = dict()
 
 previousMessages = dict()
 
-dateFormat= "%Y-%m-%dT%H:%M:%S.%f"
+publishTracker = dict()
+
+DATE_FORMAT= "%Y-%m-%dT%H:%M:%S.%f"
 
 def formatTimestamp(timestamp):
-    formattedTimestamp = datetime.strptime(timestamp,dateFormat)
+    formattedTimestamp = datetime.strptime(timestamp,DATE_FORMAT)
     formattedTimestamp = int(formattedTimestamp.timestamp()*1000000)
     return formattedTimestamp
 
@@ -77,7 +82,7 @@ def filterInfo(rawPayload):
         "spreading_factor" : int(rawPayload["uplink_message"]["settings"]["data_rate"]["lora"]["spreading_factor"]),
         "is_recovered" : False
     }
-    print("Filtered : " + str(filteredPayload))
+    debug("Uplink : for " + filteredPayload["device_id"] + " -> filtered : " + str(filteredPayload))
     return filteredPayload
 
 def readTwoBytes(index,array):
@@ -108,7 +113,7 @@ def parsePayload(message):
             data["q_pms_10"] = readTwoBytes(13+shift,payload)
     
     payload = data
-    print("Payload décodée : " + str(payload))
+    debug("Uplink : for " + message["device_id"] + " -> decoded payload " + str(payload))
     return payload    
 
 def configAllDevices():
@@ -119,18 +124,20 @@ def configAllDevices():
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
-    print("Connected to ttn mqtt")
+    debug("Connected to ttn mqtt")
 
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
     template = Template(UPLINK_TOPIC_TEMPLATE)
     for device in getDeviceIds():
         for topic in UPLINK_TOPICS:
-            client.subscribe(template.render(username=getMqttCredentials()[0],device=device,topic=topic),0)
+            topicRendered = template.render(username=getMqttCredentials()[0],device=device,topic=topic)
+            client.subscribe(topicRendered,0)
+            debug("Subscribing to topic : " + topicRendered)
     configAllDevices()
 
 def formatMsg(msg):
-    formattedMsg = json.loads(msg.payload)
+    formattedMsg = json.loads(msg)
     formattedMsg = filterInfo(formattedMsg)
     formattedMsg["payload"] = parsePayload(formattedMsg)
     return formattedMsg
@@ -141,10 +148,14 @@ def storeRecoveryLoss(nbRecovery,nbLoss,message):
     p = p.field("nb_recovery",nbRecovery)
     influxdbWriteApi.write(bucker=INFLUXDB_BUCKET,org=influxdbOrg,record=p)
     
+    debug("Storing : for " + message["device_id"] + " -> rec_los " + str(nbRecovery) + " | " + str(nbLoss))
+    
 def storeSpreadingFactor(message):
     p = influxdb_client.Point(message["device_id"] + "@" + message["app_id"]+":network-health-sf")
     p = p.field("spreading_factor", message["spreading_factor"])
     influxdbWriteApi.write(bucker=INFLUXDB_BUCKET,org=influxdbOrg,record=p)
+    
+    debug("Storing : for " + message["device_id"] + " -> sf " + str(message["spreading_factor"]))
 
 def storeMessage(message):
     p = influxdb_client.Point(message["device_id"] + "@" + message["app_id"])
@@ -158,17 +169,21 @@ def storeMessage(message):
 
     p = p.time(message["timestamp"])
     influxdbWriteApi.write(bucket=INFLUXDB_BUCKET,org=influxdbOrg,record=p)
+    
+    debug("Storing : for " + message["device_id"] + " -> message " + str(message))
 
 def storePreviousMessage(message,config):
-    if(config["recovery_interval"] == -1):
+    if(config["data_recovery"] == -1):
         return
     
     rawPayload = message["raw_payload"]
     id = int(message["message_id"])
     time = int(message["timestamp"])
     previousMessages[message["device_id"]].insert(0,[id,rawPayload,time])
-    if(len(previousMessages[message["device_id"]]) > config["recovery_interval"]  +1):
+    if(len(previousMessages[message["device_id"]]) > config["data_recovery"]  +1):
         previousMessages[message["device_id"]].pop()
+    
+    debug("Update : for " + message["device_id"] +  " -> previousMessage " + str(previousMessages))
 
 def xorPayload(a,b):
     if(a==[]):
@@ -184,7 +199,7 @@ def xorPayload(a,b):
 def recoverMessage(message,id,missingIndex,config):
     xorMsg = message["raw_payload"]
     xorServ = []
-    for i in range(1,config["recovery_interval"]):
+    for i in range(1,config["data_recovery"]):
         xor = xorPayload(xor,previousMessages[message["device_id"]][i][1])
     recoveredPayload = xorPayload(xorMsg,xorServ)
     timestamp = 0
@@ -201,18 +216,21 @@ def recoverMessage(message,id,missingIndex,config):
         "timestamp" : timestamp,
         "type" : message["type"]-3,
         "payload" : recoveredPayload,
-        "raw_payload" : binascii.b2a_base64(bytearray(recoveredPayload)),
+        "raw_payload" : binascii.b2a_base64(bytearray(recoveredPayload),newline=False).decode("utf-8"),
         "spreading_factor" : message["spreading_factor"],
         "is_recovered" : True, 
     }
     recoveredMessage["payload"] = parsePayload(recoveredMessage)
+    
+    debug("Recovered message : " + str(recoveredMessage))
+    
     return recoveredMessage
 
 def handleRecover(message,config):
-    if(config["recovery_interval"] == -1):
+    if(config["data_recovery"] == -1):
         return
 
-    if(len(previousMessages[message["device_id"]]) != config["recovery_interval"]+1):
+    if(len(previousMessages[message["device_id"]]) != config["data_recovery"]+1):
         return 
     
     recoveryId = message["message_id"]
@@ -220,7 +238,7 @@ def handleRecover(message,config):
     previousNum = recoveryId
     missingId = 0
     missingIndex = 0
-    for i in range(1, config["recovery_interval"]+1):
+    for i in range(1, config["data_recovery"]+1):
         jump = (previousNum - previousMessages[i][0]) % 256 
         if(jump > 1):
             nbJumps += jump
@@ -228,7 +246,7 @@ def handleRecover(message,config):
             missingIndex = i
         previousNum = previousMessages[message["device_id"]][i][0]
     if(nbJumps != 1):
-        print("Unable to recover : " + nbJumps + "missing messages")
+        debug("Unable to recover : for " + message["device_id"] + " -> reason " + str(nbJumps) + "missing messages")
         return
     recoveredMessage = recoverMessage(message,missingId,missingIndex,config)
     storeMessage(recoveredMessage)
@@ -238,6 +256,7 @@ def handleMessage(message,topic):
     if(topic == UP):
         message = formatMsg(message)
         if(devicesStates[message["device_id"]] != CONFIGURED):
+            debug("Ignore Message : for " + message["device_id"] + " -> state " + str(devicesStates[message["device_id"]]))
             return #ignore message
         else:
             handleUplink(message)
@@ -245,12 +264,18 @@ def handleMessage(message,topic):
         device = getEndDevice(message)
         if(devicesStates[device] == WAITING_ACK):
             devicesStates[device] == CONFIGURED
+            debug("Update : for " + message["device_id"] + " -> devicesStates " + str(devicesStates))
 
 def handleUplink(message):
+    debug("Uplink : for " + message["device_id"] + " -> message " + str(message))
+    
     config = getDeviceConfig()["sf"+str(message["spreading_factor"])]
     
     if(message["spreading_factor"] != previousSpreadingFactor[message["device_id"]]):
         previousMessages[message["device_id"]] = []
+        
+        debug("Update : for " + message["device_id"] + " -> previousMessages " + str(previousMessages))
+
     if(len(previousMessages[message["device_id"]])!=0):
         saut = (int(message["message_id"]) - previousMessages[message["message_id"]][0][0])%256
         if(saut > 1):
@@ -258,6 +283,8 @@ def handleUplink(message):
     storePreviousMessage(message,config)
     storeSpreadingFactor(message)
     previousSpreadingFactor[message["device_id"]] = message["spreading_factor"]
+
+    debug("Update : for " + message["device_id"] + " -> previousSpreadingFactor " + str(previousSpreadingFactor))
 
 
     if(message["type"] in [CONCENTRATION,UNIT,BOTH]):
@@ -276,9 +303,10 @@ def topicOf(topic):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-    print("[DEBUG] Message recieved from MQTT :\nTopic : " + str(msg.topic) + "\nMsg : " + str(msg.payload) + "\n\n\n")
+    debug("Message recieved from MQTT :\nTopic : " + str(msg.topic) + "\nMsg : " + str(msg.payload) + "\n\n\n")
+    
     topic = topicOf(str(msg.topic))
-    handleMessage(msg.payload,topic)
+    handleMessage(msg.payload.decode("utf-8"),topic)
 
 def formDownlinkPayload(config):
     payload = bytearray()
@@ -286,43 +314,54 @@ def formDownlinkPayload(config):
         elems = config["sf"+str(x)]
         byte = UPLINK_INTERVAL_DICT_REV[elems["data_interval"]] << 5 
         byte |= elems["data_type"] << 3
-        byte |= RECOVERY_INTERVAL_DICT_REV[elems["recovery_interval"]]
+        byte |= RECOVERY_INTERVAL_DICT_REV[elems["data_recovery"]]
         payload.append(byte)
-    return binascii.b2a_base64(payload)
+    return binascii.b2a_base64(payload, newline=False).decode("utf-8")
 
 def configDevice(device_id):
+    debug("Reconfigure : for " + device_id)
     devicesStates[device_id] = NOT_CONFIGURED
+    debug("Update : for " + device_id + " -> devicesStates " + str(devicesStates))
     previousMessages[device_id] = []
-    payload = formDownlinkPayload(getDeviceConfig())
+    payloadbase64 = formDownlinkPayload(getDeviceConfig())
     downlink = {
         "downlinks": [{
         "f_port": 1,
-        "frm_payload": payload,
+        "frm_payload": payloadbase64,
         "confirmed": True,
         "correlation_ids": [device_id]
     }]}
-    payload = json.dumps(downlink)
+    payloadjson = str(json.dumps(downlink))
     template = Template(DOWNLINK_TOPIC_TEMPLATE)
     topic = template.render(username = getMqttCredentials()[0],device=device_id)
-    mqttBrokerClient.publish(topic, payload=payload, qos=2, retain=False).wait_for_publish()
+    debug("Publishing : for " + device_id + " -> topic " + topic + " payload " + str(payloadjson))
+    messageInfo = mqttBrokerClient.publish(topic, payload=payloadjson, qos=0, retain=False)
+    publishTracker[messageInfo.mid] = device_id
+
+def on_publish(client, userdata, mid):
+    device_id = publishTracker[mid]
     devicesStates[device_id] = WAITING_ACK
+    publishTracker.pop(mid)
+    debug("Update : for " + device_id + " -> devicesStates " + str(devicesStates))
 
 def on_disconnect(client, userdata, rc):
-    print("disconnected")
+    debug("MQTT disconnected")
 
 def on_connect_fail(client, userdata, rc):
-    print("fail")
+    debug("MQTT connection failed")
 
 def main():
     init()
     httpServerWorker = threading.Thread(target=runHttpServer)
     httpServerWorker.start()
+
     credentials = getMqttCredentials()
     mqttBrokerClient.reconnect_delay_set(min_delay=10,max_delay=21600)
     mqttBrokerClient.username_pw_set(credentials[0],credentials[1])
     mqttBrokerClient.on_connect = on_connect
     mqttBrokerClient.on_connect_fail = on_connect_fail
     mqttBrokerClient.on_message = on_message
+    mqttBrokerClient.on_publish = on_publish
     mqttBrokerClient.on_disconnect = on_disconnect
     mqttBrokerClient.connect_async(TTN_MQTT_BROKER_ADDRESS, port=TTN_MQTT_BROKER_PORT, keepalive=60, bind_address="")
     mqttBrokerClient.loop_forever(retry_first_connection=True)
@@ -335,26 +374,39 @@ env = Environment(
 
 def handleDeviceConfig(data):
     for i in range(7,13):
-        if(data["sf"+str(i)]["recovery_interval"] == 1000):
-            data["sf"+str(i)]["recovery_interval"] = -1
+        if(data["sf"+str(i)]["data_recovery"] == 1000):
+            data["sf"+str(i)]["data_recovery"] = -1
     setDeviceConfig(data)
+    debug("Update : config " + str(data))
     configAllDevices()
 
 def handleAppConfig(data):
     setMqttCredentials(data["username"],data["api-key"])
+    mqttBrokerClient.username_pw_set(data["username"],data["api-key"])
     mqttBrokerClient.reconnect()
 
 def handleAddDevice(data):
     devices = getDeviceIds()
     device = data['end-device']
     if(device in devices):
+        debug("Unable to add end device : " + data["end-device"])
         return False
     else:
         devices.append(device)
         setDeviceIds(devices)
+        debug("Update : devices ids " + str(devices))
+        previousMessages[device] = []
+        debug("Update : for " + device + " -> previousMessages " + str(previousMessages))
+        devicesStates[device] = NOT_CONFIGURED
+        debug("Update : for " + device + " -> devicesStates " + str(devicesStates))
+        previousSpreadingFactor[device] = 0
+        debug("Update : for " + device + " -> previousSpreadingFactor " + str(previousSpreadingFactor))
+        
         template = Template(UPLINK_TOPIC_TEMPLATE)
         for topic in UPLINK_TOPICS:
-            mqttBrokerClient.subscribe(template.render(username=getMqttCredentials()[0],device=device,topic=topic),0)
+            topicRendered = template.render(username=getMqttCredentials()[0],device=device,topic=topic)
+            mqttBrokerClient.subscribe(topicRendered,0)
+            debug("Subscribing to topic : " + topicRendered)
         configDevice(device)
         return True
 
@@ -363,11 +415,18 @@ def handleRemoveDevice(data):
     device = data['end-device']
     devices.remove(device)
     setDeviceIds(devices)
+    debug("Update : devices ids " + str(devices))
     template = Template(UPLINK_TOPIC_TEMPLATE)
     for topic in UPLINK_TOPICS:
-        mqttBrokerClient.unsubscribe(template.render(username=getMqttCredentials()[0],device=device,topic=topic),0)
+        topicRendered = template.render(username=getMqttCredentials()[0],device=device,topic=topic)
+        mqttBrokerClient.unsubscribe(topicRendered,0)
+        debug("Unsubscribing from topic : " + topicRendered)
     previousMessages.pop(device)
+    debug("Update : previousMessages " + str(previousMessages))
     devicesStates.pop(device)
+    debug("Update : devicesStates " + str(devicesStates))
+    previousSpreadingFactor.pop(device)
+    debug("Update : previousSpreadingFactor " + str(previousSpreadingFactor))
 
 class DownlinkServer(SimpleHTTPRequestHandler):
     def do_POST(self):
@@ -375,6 +434,8 @@ class DownlinkServer(SimpleHTTPRequestHandler):
         post_data = self.rfile.read(content_length) # <--- Gets the data itself
         pd = post_data.decode("utf-8")   # <-------- ADD this line
         data = json.loads(pd)
+        debug("HTTP POST Request : adress " + self.path)
+        debug("content : " + str(data))
         if(self.path == "/api-backend/config_device"):
             self.send_response(200)
             self.send_header("Content-type", "text/html")
@@ -404,6 +465,9 @@ class DownlinkServer(SimpleHTTPRequestHandler):
             self.send_header("Content-type", "text/html")
             self.end_headers()
     def do_GET(self):
+
+        debug("HTTP GET Request : adress " + self.path)
+
         if(self.path[13:] == "enddevicePage.html"):
             template = env.get_template(self.path[13:])
             credentials = getMqttCredentials()
@@ -414,7 +478,6 @@ class DownlinkServer(SimpleHTTPRequestHandler):
             self.wfile.write(bytes(msg,"utf-8"))
         else :
             self.path = '/templates/' + self.path[13:]
-            print(self.path)
             return SimpleHTTPRequestHandler.do_GET(self)
 
 def runHttpServer(server_class=HTTPServer, handler_class=DownlinkServer):
@@ -423,6 +486,7 @@ def runHttpServer(server_class=HTTPServer, handler_class=DownlinkServer):
     httpd.serve_forever()
 
 def init():
+    debug("Initializing.")
     loadConfig()
     devices = getDeviceIds()
     for device in devices:
@@ -430,5 +494,8 @@ def init():
         previousMessages[device] = []
         previousSpreadingFactor[device] = 0
 
+def debug(x):
+    if(DEBUG):
+        print("[DEBUG] " + str(x))
 
 main()

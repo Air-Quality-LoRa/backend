@@ -1,204 +1,206 @@
-<head>
-    <meta charset="utf-8">
-    <script type="text/javascript" src="configpage.js"></script>
-</head>
-<html>
-    <div id="SF7">
-        <select id="data_type_sf7" name="recovery_interval" onchange="triggerChangeSFX('7')">
-            <option id="val0_sf7" value="-1">Choississez</option>
-            <option id="val1_sf7" value="1">Les concentrations</option>
-            <option id="val2_sf7" value="2">Le nombre de particule</option>
-            <option id="val3_sf7" value="3">Les deux</option>
-        </select>
+<html >
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="configpage.js"></script>
+    </head>
+    <body onload="onload()">
+        <div id="SF7">
+            <select id="data_type_sf7" name="recovery_interval" onchange="triggerChangeSFX('7')">
+                <option id="val0_sf7" value="-1">Choississez</option>
+                <option id="val1_sf7" value="1">Les concentrations</option>
+                <option id="val2_sf7" value="2">Le nombre de particule</option>
+                <option id="val3_sf7" value="3">Les deux</option>
+            </select>
 
-        <select id="data_interval_sf7" name="data_interval" onchange="triggerChangeSFX('7')">
-            <option id="dat0_sf7" value="-1">Choississez</option>
-            <option id="dat1_sf7" value="5">Toutes les 5 minutes</option>
-            <option id="dat2_sf7" value="10">Toutes les 10 minutes</option>
-            <option id="dat3_sf7" value="15">Toutes les 15 minutes</option>
-            <option id="dat4_sf7" value="20">Toutes les 20 minutes</option>
-            <option id="dat5_sf7" value="30">Toutes les 30 minutes</option>
-            <option id="dat6_sf7" value="45">Toutes les 45 minutes</option>
-            <option id="dat7_sf7" value="60">Toutes les heures </option>
-            <option id="dat8_sf7" value="120">Toutes les 2 heures</option>
-        </select>
-    
-        <select id="recovery_interval_sf7" name="recovery_interval">
-            <option id="rec0_sf7" value="-1">Choississez</option>
-            <option id="rec2_sf7" value="2">Tout les 2 messages</option>
-            <option id="rec3_sf7" value="4">Tout les 4 messages</option>
-            <option id="rec4_sf7" value="8">Tout les 8 messages</option>
-            <option id="rec5_sf7" value="16">Tout les 16 messages</option>
-            <option id="rec6_sf7" value="32">Tout les 32 messages</option>
-            <option id="rec7_sf7" value="64">Tout les 64 messages</option>
-            <option id="rec8_sf7" value="128">Tout les 128 messages</option>
-            <option id="rec1_sf7" value="1000">Jamais</option>
-        </select>
-    </div>
-    <div id="SF8">
-        <select id="data_type_sf8" name="recovery_interval" onchange="triggerChangeSFX('8')">
-            <option id="val0_sf8" value="-1">Choississez</option>
-            <option id="val1_sf8" value="1">Les concentrations</option>
-            <option id="val2_sf8" value="2">Le nombre de particule</option>
-            <option id="val3_sf8" value="3">Les deux</option>
-        </select>
+            <select id="data_interval_sf7" name="data_interval" onchange="triggerChangeSFX('7')">
+                <option id="dat0_sf7" value="-1">Choississez</option>
+                <option id="dat1_sf7" value="5">Toutes les 5 minutes</option>
+                <option id="dat2_sf7" value="10">Toutes les 10 minutes</option>
+                <option id="dat3_sf7" value="15">Toutes les 15 minutes</option>
+                <option id="dat4_sf7" value="20">Toutes les 20 minutes</option>
+                <option id="dat5_sf7" value="30">Toutes les 30 minutes</option>
+                <option id="dat6_sf7" value="45">Toutes les 45 minutes</option>
+                <option id="dat7_sf7" value="60">Toutes les heures </option>
+                <option id="dat8_sf7" value="120">Toutes les 2 heures</option>
+            </select>
+        
+            <select id="recovery_interval_sf7" name="recovery_interval">
+                <option id="rec0_sf7" value="-1">Choississez</option>
+                <option id="rec2_sf7" value="2">Tout les 2 messages</option>
+                <option id="rec3_sf7" value="4">Tout les 4 messages</option>
+                <option id="rec4_sf7" value="8">Tout les 8 messages</option>
+                <option id="rec5_sf7" value="16">Tout les 16 messages</option>
+                <option id="rec6_sf7" value="32">Tout les 32 messages</option>
+                <option id="rec7_sf7" value="64">Tout les 64 messages</option>
+                <option id="rec8_sf7" value="128">Tout les 128 messages</option>
+                <option id="rec1_sf7" value="1000">Jamais</option>
+            </select>
+        </div>
+        <div id="SF8">
+            <select id="data_type_sf8" name="recovery_interval" onchange="triggerChangeSFX('8')">
+                <option id="val0_sf8" value="-1">Choississez</option>
+                <option id="val1_sf8" value="1">Les concentrations</option>
+                <option id="val2_sf8" value="2">Le nombre de particule</option>
+                <option id="val3_sf8" value="3">Les deux</option>
+            </select>
 
-        <select id="data_interval_sf8" name="data_interval" onchange="triggerChangeSFX('8')">
-            <option id="dat0_sf8" value="-1">Choississez</option>
-            <option id="dat1_sf8" value="5" disabled>Toutes les 5 minutes</option>
-            <option id="dat2_sf8" value="10">Toutes les 10 minutes</option>
-            <option id="dat3_sf8" value="15">Toutes les 15 minutes</option>
-            <option id="dat4_sf8" value="20">Toutes les 20 minutes</option>
-            <option id="dat5_sf8" value="30">Toutes les 30 minutes</option>
-            <option id="dat6_sf8" value="45">Toutes les 45 minutes</option>
-            <option id="dat7_sf8" value="60">Toutes les heures </option>
-            <option id="dat8_sf8" value="120">Toutes les 2 heures</option>
-        </select>
-    
-        <select id="recovery_interval_sf8" name="recovery_interval">
-            <option id="rec0_sf8" value="-1">Choississez</option>
-            <option id="rec2_sf8" value="2">Tout les 2 messages</option>
-            <option id="rec3_sf8" value="4">Tout les 4 messages</option>
-            <option id="rec4_sf8" value="8">Tout les 8 messages</option>
-            <option id="rec5_sf8" value="16">Tout les 16 messages</option>
-            <option id="rec6_sf8" value="32">Tout les 32 messages</option>
-            <option id="rec7_sf8" value="64">Tout les 64 messages</option>
-            <option id="rec8_sf8" value="128">Tout les 128 messages</option>
-            <option id="rec1_sf8" value="1000">Jamais</option>
-        </select>
-    </div>
+            <select id="data_interval_sf8" name="data_interval" onchange="triggerChangeSFX('8')">
+                <option id="dat0_sf8" value="-1">Choississez</option>
+                <option id="dat1_sf8" value="5" disabled>Toutes les 5 minutes</option>
+                <option id="dat2_sf8" value="10">Toutes les 10 minutes</option>
+                <option id="dat3_sf8" value="15">Toutes les 15 minutes</option>
+                <option id="dat4_sf8" value="20">Toutes les 20 minutes</option>
+                <option id="dat5_sf8" value="30">Toutes les 30 minutes</option>
+                <option id="dat6_sf8" value="45">Toutes les 45 minutes</option>
+                <option id="dat7_sf8" value="60">Toutes les heures </option>
+                <option id="dat8_sf8" value="120">Toutes les 2 heures</option>
+            </select>
+        
+            <select id="recovery_interval_sf8" name="recovery_interval">
+                <option id="rec0_sf8" value="-1">Choississez</option>
+                <option id="rec2_sf8" value="2">Tout les 2 messages</option>
+                <option id="rec3_sf8" value="4">Tout les 4 messages</option>
+                <option id="rec4_sf8" value="8">Tout les 8 messages</option>
+                <option id="rec5_sf8" value="16">Tout les 16 messages</option>
+                <option id="rec6_sf8" value="32">Tout les 32 messages</option>
+                <option id="rec7_sf8" value="64">Tout les 64 messages</option>
+                <option id="rec8_sf8" value="128">Tout les 128 messages</option>
+                <option id="rec1_sf8" value="1000">Jamais</option>
+            </select>
+        </div>
 
-    <div id="SF9">
-        <select id="data_type_sf9" name="recovery_interval" onchange="triggerChangeSFX('9')">
-            <option id="val0_sf9" value="-1">Choississez</option>
-            <option id="val1_sf9" value="1">Les concentrations</option>
-            <option id="val2_sf9" value="2">Le nombre de particule</option>
-            <option id="val3_sf9" value="3">Les deux</option>
-        </select>
+        <div id="SF9">
+            <select id="data_type_sf9" name="recovery_interval" onchange="triggerChangeSFX('9')">
+                <option id="val0_sf9" value="-1">Choississez</option>
+                <option id="val1_sf9" value="1">Les concentrations</option>
+                <option id="val2_sf9" value="2">Le nombre de particule</option>
+                <option id="val3_sf9" value="3">Les deux</option>
+            </select>
 
-        <select id="data_interval_sf9" name="data_interval" onchange="triggerChangeSFX('9')">
-            <option id="dat0_sf9" value="-1">Choississez</option>
-            <option id="dat1_sf9" value="5" disabled>Toutes les 5 minutes</option>
-            <option id="dat2_sf9" value="10">Toutes les 10 minutes</option>
-            <option id="dat3_sf9" value="15">Toutes les 15 minutes</option>
-            <option id="dat4_sf9" value="20">Toutes les 20 minutes</option>
-            <option id="dat5_sf9" value="30">Toutes les 30 minutes</option>
-            <option id="dat6_sf9" value="45">Toutes les 45 minutes</option>
-            <option id="dat7_sf9" value="60">Toutes les heures </option>
-            <option id="dat8_sf9" value="120">Toutes les 2 heures</option>
-        </select>
-    
-        <select id="recovery_interval_sf9" name="recovery_interval">
-            <option id="rec0_sf9" value="-1">Choississez</option>
-            <option id="rec2_sf9" value="2">Tout les 2 messages</option>
-            <option id="rec3_sf9" value="4">Tout les 4 messages</option>
-            <option id="rec4_sf9" value="8">Tout les 8 messages</option>
-            <option id="rec5_sf9" value="16">Tout les 16 messages</option>
-            <option id="rec6_sf9" value="32">Tout les 32 messages</option>
-            <option id="rec7_sf9" value="64">Tout les 64 messages</option>
-            <option id="rec8_sf9" value="128">Tout les 128 messages</option>
-            <option id="rec1_sf9" value="1000">Jamais</option>
-        </select>
-    </div>
+            <select id="data_interval_sf9" name="data_interval" onchange="triggerChangeSFX('9')">
+                <option id="dat0_sf9" value="-1">Choississez</option>
+                <option id="dat1_sf9" value="5" disabled>Toutes les 5 minutes</option>
+                <option id="dat2_sf9" value="10">Toutes les 10 minutes</option>
+                <option id="dat3_sf9" value="15">Toutes les 15 minutes</option>
+                <option id="dat4_sf9" value="20">Toutes les 20 minutes</option>
+                <option id="dat5_sf9" value="30">Toutes les 30 minutes</option>
+                <option id="dat6_sf9" value="45">Toutes les 45 minutes</option>
+                <option id="dat7_sf9" value="60">Toutes les heures </option>
+                <option id="dat8_sf9" value="120">Toutes les 2 heures</option>
+            </select>
+        
+            <select id="recovery_interval_sf9" name="recovery_interval">
+                <option id="rec0_sf9" value="-1">Choississez</option>
+                <option id="rec2_sf9" value="2">Tout les 2 messages</option>
+                <option id="rec3_sf9" value="4">Tout les 4 messages</option>
+                <option id="rec4_sf9" value="8">Tout les 8 messages</option>
+                <option id="rec5_sf9" value="16">Tout les 16 messages</option>
+                <option id="rec6_sf9" value="32">Tout les 32 messages</option>
+                <option id="rec7_sf9" value="64">Tout les 64 messages</option>
+                <option id="rec8_sf9" value="128">Tout les 128 messages</option>
+                <option id="rec1_sf9" value="1000">Jamais</option>
+            </select>
+        </div>
 
-    <div id="SF10">
-        <select id="data_type_sf10" name="recovery_interval" onchange="triggerChangeSFX('10')">
-            <option id="val0_sf10" value="-1">Choississez</option>
-            <option id="val1_sf10" value="1">Les concentrations</option>
-            <option id="val2_sf10" value="2">Le nombre de particule</option>
-            <option id="val3_sf10" value="3">Les deux</option>
-        </select>
+        <div id="SF10">
+            <select id="data_type_sf10" name="recovery_interval" onchange="triggerChangeSFX('10')">
+                <option id="val0_sf10" value="-1">Choississez</option>
+                <option id="val1_sf10" value="1">Les concentrations</option>
+                <option id="val2_sf10" value="2">Le nombre de particule</option>
+                <option id="val3_sf10" value="3">Les deux</option>
+            </select>
 
-        <select id="data_interval_sf10" name="data_interval" onchange="triggerChangeSFX('10')">
-            <option id="dat0_sf10" value="-1">Choississez</option>
-            <option id="dat1_sf10" value="5" disabled>Toutes les 5 minutes</option>
-            <option id="dat2_sf10" value="10" disabled>Toutes les 10 minutes</option>
-            <option id="dat3_sf10" value="15" disabled>Toutes les 15 minutes</option>
-            <option id="dat4_sf10" value="20">Toutes les 20 minutes</option>
-            <option id="dat5_sf10" value="30">Toutes les 30 minutes</option>
-            <option id="dat6_sf10" value="45">Toutes les 45 minutes</option>
-            <option id="dat7_sf10" value="60">Toutes les heures </option>
-            <option id="dat8_sf10" value="120">Toutes les 2 heures</option>
-        </select>
-    
-        <select id="recovery_interval_sf10" name="recovery_interval">
-            <option id="rec0_sf10" value="-1">Choississez</option>
-            <option id="rec2_sf10" value="2">Tout les 2 messages</option>
-            <option id="rec3_sf10" value="4">Tout les 4 messages</option>
-            <option id="rec4_sf10" value="8">Tout les 8 messages</option>
-            <option id="rec5_sf10" value="16">Tout les 16 messages</option>
-            <option id="rec6_sf10" value="32">Tout les 32 messages</option>
-            <option id="rec7_sf10" value="64">Tout les 64 messages</option>
-            <option id="rec8_sf10" value="128">Tout les 128 messages</option>
-            <option id="rec1_sf10" value="1000">Jamais</option>
-        </select>
-    </div>
+            <select id="data_interval_sf10" name="data_interval" onchange="triggerChangeSFX('10')">
+                <option id="dat0_sf10" value="-1">Choississez</option>
+                <option id="dat1_sf10" value="5" disabled>Toutes les 5 minutes</option>
+                <option id="dat2_sf10" value="10" disabled>Toutes les 10 minutes</option>
+                <option id="dat3_sf10" value="15" disabled>Toutes les 15 minutes</option>
+                <option id="dat4_sf10" value="20">Toutes les 20 minutes</option>
+                <option id="dat5_sf10" value="30">Toutes les 30 minutes</option>
+                <option id="dat6_sf10" value="45">Toutes les 45 minutes</option>
+                <option id="dat7_sf10" value="60">Toutes les heures </option>
+                <option id="dat8_sf10" value="120">Toutes les 2 heures</option>
+            </select>
+        
+            <select id="recovery_interval_sf10" name="recovery_interval">
+                <option id="rec0_sf10" value="-1">Choississez</option>
+                <option id="rec2_sf10" value="2">Tout les 2 messages</option>
+                <option id="rec3_sf10" value="4">Tout les 4 messages</option>
+                <option id="rec4_sf10" value="8">Tout les 8 messages</option>
+                <option id="rec5_sf10" value="16">Tout les 16 messages</option>
+                <option id="rec6_sf10" value="32">Tout les 32 messages</option>
+                <option id="rec7_sf10" value="64">Tout les 64 messages</option>
+                <option id="rec8_sf10" value="128">Tout les 128 messages</option>
+                <option id="rec1_sf10" value="1000">Jamais</option>
+            </select>
+        </div>
 
-    <div id="SF11">
-        <select id="data_type_sf11" name="recovery_interval" onchange="triggerChangeSFX('11')">
-            <option id="val0_sf11" value="-1">Choississez</option>
-            <option id="val1_sf11" value="1">Les concentrations</option>
-            <option id="val2_sf11" value="2">Le nombre de particule</option>
-            <option id="val3_sf11" value="3">Les deux</option>
-        </select>
+        <div id="SF11">
+            <select id="data_type_sf11" name="recovery_interval" onchange="triggerChangeSFX('11')">
+                <option id="val0_sf11" value="-1">Choississez</option>
+                <option id="val1_sf11" value="1">Les concentrations</option>
+                <option id="val2_sf11" value="2">Le nombre de particule</option>
+                <option id="val3_sf11" value="3">Les deux</option>
+            </select>
 
-        <select id="data_interval_sf11" name="data_interval" onchange="triggerChangeSFX('11')">
-            <option id="dat0_sf11" value="-1">Choississez</option>
-            <option id="dat1_sf11" value="5" disabled>Toutes les 5 minutes</option>
-            <option id="dat2_sf11" value="10" disabled>Toutes les 10 minutes</option>
-            <option id="dat3_sf11" value="15" disabled>Toutes les 15 minutes</option>
-            <option id="dat4_sf11" value="20" disabled>Toutes les 20 minutes</option>
-            <option id="dat5_sf11" value="30" disabled>Toutes les 30 minutes</option>
-            <option id="dat6_sf11" value="45">Toutes les 45 minutes</option>
-            <option id="dat7_sf11" value="60">Toutes les heures </option>
-            <option id="dat8_sf11" value="120">Toutes les 2 heures</option>
-        </select>
-    
-        <select id="recovery_interval_sf11" name="recovery_interval">
-            <option id="rec0_sf11" value="-1">Choississez</option>
-            <option id="rec2_sf11" value="2">Tout les 2 messages</option>
-            <option id="rec3_sf11" value="4">Tout les 4 messages</option>
-            <option id="rec4_sf11" value="8">Tout les 8 messages</option>
-            <option id="rec5_sf11" value="16">Tout les 16 messages</option>
-            <option id="rec6_sf11" value="32">Tout les 32 messages</option>
-            <option id="rec7_sf11" value="64">Tout les 64 messages</option>
-            <option id="rec8_sf11" value="128">Tout les 128 messages</option>
-            <option id="rec1_sf11" value="1000">Jamais</option>
-        </select>
-    </div>
+            <select id="data_interval_sf11" name="data_interval" onchange="triggerChangeSFX('11')">
+                <option id="dat0_sf11" value="-1">Choississez</option>
+                <option id="dat1_sf11" value="5" disabled>Toutes les 5 minutes</option>
+                <option id="dat2_sf11" value="10" disabled>Toutes les 10 minutes</option>
+                <option id="dat3_sf11" value="15" disabled>Toutes les 15 minutes</option>
+                <option id="dat4_sf11" value="20" disabled>Toutes les 20 minutes</option>
+                <option id="dat5_sf11" value="30" disabled>Toutes les 30 minutes</option>
+                <option id="dat6_sf11" value="45">Toutes les 45 minutes</option>
+                <option id="dat7_sf11" value="60">Toutes les heures </option>
+                <option id="dat8_sf11" value="120">Toutes les 2 heures</option>
+            </select>
+        
+            <select id="recovery_interval_sf11" name="recovery_interval">
+                <option id="rec0_sf11" value="-1">Choississez</option>
+                <option id="rec2_sf11" value="2">Tout les 2 messages</option>
+                <option id="rec3_sf11" value="4">Tout les 4 messages</option>
+                <option id="rec4_sf11" value="8">Tout les 8 messages</option>
+                <option id="rec5_sf11" value="16">Tout les 16 messages</option>
+                <option id="rec6_sf11" value="32">Tout les 32 messages</option>
+                <option id="rec7_sf11" value="64">Tout les 64 messages</option>
+                <option id="rec8_sf11" value="128">Tout les 128 messages</option>
+                <option id="rec1_sf11" value="1000">Jamais</option>
+            </select>
+        </div>
 
-    <div id="SF12">
-        <select id="data_type_sf12" name="recovery_interval" onchange="triggerChangeSFX('12')">
-            <option id="val0_sf12" value="-1">Choississez</option>
-            <option id="val1_sf12" value="1">Les concentrations</option>
-            <option id="val2_sf12" value="2">Le nombre de particule</option>
-            <option id="val3_sf12" value="3">Les deux</option>
-        </select>
+        <div id="SF12">
+            <select id="data_type_sf12" name="recovery_interval" onchange="triggerChangeSFX('12')">
+                <option id="val0_sf12" value="-1">Choississez</option>
+                <option id="val1_sf12" value="1">Les concentrations</option>
+                <option id="val2_sf12" value="2">Le nombre de particule</option>
+                <option id="val3_sf12" value="3">Les deux</option>
+            </select>
 
-        <select id="data_interval_sf12" name="data_interval" onchange="triggerChangeSFX('12')">
-            <option id="dat0_sf12" value="-1">Choississez</option>
-            <option id="dat1_sf12" value="5" disabled>Toutes les 5 minutes</option>
-            <option id="dat2_sf12" value="10" disabled>Toutes les 10 minutes</option>
-            <option id="dat3_sf12" value="15" disabled>Toutes les 15 minutes</option>
-            <option id="dat4_sf12" value="20" disabled>Toutes les 20 minutes</option>
-            <option id="dat5_sf12" value="30" disabled>Toutes les 30 minutes</option>
-            <option id="dat6_sf12" value="45" disabled>Toutes les 45 minutes</option>
-            <option id="dat7_sf12" value="60" disabled>Toutes les heures </option>
-            <option id="dat8_sf12" value="120">Toutes les 2 heures</option>
-        </select>
-    
-        <select id="recovery_interval_sf12" name="recovery_interval">
-            <option id="rec0_sf12" value="-1">Choississez</option>
-            <option id="rec2_sf12" value="2">Tout les 2 messages</option>
-            <option id="rec3_sf12" value="4">Tout les 4 messages</option>
-            <option id="rec4_sf12" value="8">Tout les 8 messages</option>
-            <option id="rec5_sf12" value="16">Tout les 16 messages</option>
-            <option id="rec6_sf12" value="32">Tout les 32 messages</option>
-            <option id="rec7_sf12" value="64">Tout les 64 messages</option>
-            <option id="rec8_sf12" value="128">Tout les 128 messages</option>
-            <option id="rec1_sf12" value="1000">Jamais</option>
-        </select>
-    </div>
-    <button onclick="sendConfig()">Envoyer</button>
-    <p id="incomplete-error" hidden="true">Erreur : Vous devez choisir tous les paramètres.</p>
+            <select id="data_interval_sf12" name="data_interval" onchange="triggerChangeSFX('12')">
+                <option id="dat0_sf12" value="-1">Choississez</option>
+                <option id="dat1_sf12" value="5" disabled>Toutes les 5 minutes</option>
+                <option id="dat2_sf12" value="10" disabled>Toutes les 10 minutes</option>
+                <option id="dat3_sf12" value="15" disabled>Toutes les 15 minutes</option>
+                <option id="dat4_sf12" value="20" disabled>Toutes les 20 minutes</option>
+                <option id="dat5_sf12" value="30" disabled>Toutes les 30 minutes</option>
+                <option id="dat6_sf12" value="45" disabled>Toutes les 45 minutes</option>
+                <option id="dat7_sf12" value="60" disabled>Toutes les heures </option>
+                <option id="dat8_sf12" value="120">Toutes les 2 heures</option>
+            </select>
+        
+            <select id="recovery_interval_sf12" name="recovery_interval">
+                <option id="rec0_sf12" value="-1">Choississez</option>
+                <option id="rec2_sf12" value="2">Tout les 2 messages</option>
+                <option id="rec3_sf12" value="4">Tout les 4 messages</option>
+                <option id="rec4_sf12" value="8">Tout les 8 messages</option>
+                <option id="rec5_sf12" value="16">Tout les 16 messages</option>
+                <option id="rec6_sf12" value="32">Tout les 32 messages</option>
+                <option id="rec7_sf12" value="64">Tout les 64 messages</option>
+                <option id="rec8_sf12" value="128">Tout les 128 messages</option>
+                <option id="rec1_sf12" value="1000">Jamais</option>
+            </select>
+        </div>
+        <button onclick="sendConfig()">Envoyer</button>
+        <p id="incomplete-error" hidden="true">Erreur : Vous devez choisir tous les paramètres.</p>
+    </body>
 </html>
