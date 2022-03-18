@@ -18,5 +18,5 @@ services:
       - 1885:1885
     volumes:
       - ./configuration/python-backend/:/app/config
-      # - ./air-quality-lorawan:/app
+      - ./air-quality-lorawan:/app
     restart: unless-stopped

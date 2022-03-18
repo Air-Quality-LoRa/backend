@@ -28,9 +28,10 @@ def getMqttCredentials():
 
 def saveConfig():
     global configuration
-    with open('config/config.json.tmp', 'w') as f:
+    # with open('config/config.json.tmp', 'w') as f:
+    with open('config/config.json', 'w') as f:
         f.write(json.dumps(configuration))
-    os.replace('config.json.tmp', 'config.json')
+    # os.replace('config.json.tmp', 'config.json')
 
 def loadConfig():
     global configuration

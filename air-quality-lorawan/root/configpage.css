@@ -1,0 +1,25 @@
+.selectors {
+    display: flex;
+    flex-direction: horizontal;
+}
+
+select {
+    margin:10px
+}
+
+#sendButton {
+    background-color: green;
+    color:white;
+    border: none;
+    width:100px;
+    height: 50px;
+}
+
+img {
+    height: 30px;
+}
+
+#incomplete-error {
+    color:red;
+    font-weight: bold;
+}

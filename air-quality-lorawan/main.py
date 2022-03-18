@@ -1,4 +1,3 @@
-from email import message
 import threading
 from time import sleep
 import paho.mqtt.client as mqtt
@@ -16,7 +15,17 @@ DEBUG = True
 
 NOT_CONFIGURED = 0
 WAITING_ACK = 1
-CONFIGURED = 2
+JUST_CONFIGURED = 2
+CONFIGURED = 3
+
+MQTT_PUBLISH_EVENT = 0
+MQTT_ACK_EVENT = 1
+BOARD_DATA_EVENT = 2
+BOARD_RECOVERY_EVENT = 3
+USER_CONFIG_EVENT = 4
+SERVER_CONFIG_EVENT = 5
+BOARD_REQUEST_CONFIG_EVENT = 6
+UNKNOWN_EVENT = 7
 
 REQUEST_CONFIG = 1
 CONCENTRATION = 2
@@ -35,17 +44,21 @@ UPLINK_INTERVAL_DICT_REV = {120:0,60:1,45:2,30:3,20:4,15:5,10:6,5:7}
 RECOVERY_INTERVAL_DICT_REV = {-1:0,2:1,4:2,8:3,16:4,32:5,64:6,128:7}
 
 UPLINK_TOPIC_TEMPLATE = "v3/{{username}}/devices/{{device}}/{{topic}}"
-UPLINK_TOPICS = ["up","down/nack"]
+# UPLINK_TOPIC_TEMPLATE = "application/{{username}}/device/{{device}}/event/{{topic}}"
+UPLINK_TOPICS = ["up","down/ack"]
+# UPLINK_TOPICS = ["up","ack"]
 DOWNLINK_TOPIC_TEMPLATE = "v3/{{username}}/devices/{{device}}/down/replace"
+# mqtt_username = ""
 
 TTN_MQTT_BROKER_ADDRESS = "eu1.cloud.thethings.network"
+# TTN_MQTT_BROKER_ADDRESS = "lns.campusiot.imag.fr"
 TTN_MQTT_BROKER_PORT = 1883
 
-influxdbAddress = "localhost" #os.environ["influxdbAddress"]
+influxdbAddress = "influxdb" #os.environ["influxdb_Address"]
 influxdbPort = "8086" #os.environ["influxdbPort"]
 influxdbUsername = "admin" 
-influxdbToken = "o92Qd_sO34KKh7lj3AczKutxH5aZ8vTGytrud-iKu7FvA4bo-nvOj09g9SRGbFnitFi4XoG8Iri32_0DORhR7Q=="
-influxdbOrg = "f43170103778eb07"
+influxdbToken = "__SUPER_SECRET_TOKEN_TO_CHANGE__"
+influxdbOrg = "air-quality"
 INFLUXDB_BUCKET = "air-quality"
 
 mqttBrokerClient = mqtt.Client()
@@ -64,25 +77,68 @@ DATE_FORMAT= "%Y-%m-%dT%H:%M:%S.%f"
 
 def formatTimestamp(timestamp):
     formattedTimestamp = datetime.strptime(timestamp,DATE_FORMAT)
-    formattedTimestamp = int(formattedTimestamp.timestamp()*1000000)
+    formattedTimestamp = int(formattedTimestamp.timestamp()*1000000000)
     return formattedTimestamp
 
 def getEndDevice(message):
     return message["end_device_ids"]["device_id"]
+    # return message["deviceName"]
+
+def getPort(message):
+    return message["uplink_message"]["f_port"]
+    # return message["fPort"]
 
 def filterInfo(rawPayload):
-    arrayPayload = binascii.a2b_base64(rawPayload["uplink_message"]["frm_payload"])
-    filteredPayload = {
-        "message_id" : arrayPayload[0],
-        "device_id" : rawPayload["end_device_ids"]["device_id"],
-        "app_id" : rawPayload["end_device_ids"]["application_ids"]["application_id"],
-        "timestamp" : formatTimestamp(rawPayload["received_at"][:-4]),
-        "type" : int(rawPayload["uplink_message"]["f_port"]),
-        "payload" : arrayPayload,
-        "raw_payload" : rawPayload["uplink_message"]["frm_payload"],
-        "spreading_factor" : int(rawPayload["uplink_message"]["settings"]["data_rate"]["lora"]["spreading_factor"]),
-        "is_recovered" : False
-    }
+    try:
+        arrayPayload = binascii.a2b_base64(rawPayload["uplink_message"]["frm_payload"])
+        filteredPayload = {
+            "message_id" : arrayPayload[0],
+            "device_id" : rawPayload["end_device_ids"]["device_id"],
+            "app_id" : rawPayload["end_device_ids"]["application_ids"]["application_id"],
+            "timestamp" : formatTimestamp(rawPayload["received_at"][:-4]),
+            "type" : int(rawPayload["uplink_message"]["f_port"]),
+            "payload" : arrayPayload,
+            "raw_payload" : rawPayload["uplink_message"]["frm_payload"],
+            "spreading_factor" : int(rawPayload["uplink_message"]["settings"]["data_rate"]["lora"]["spreading_factor"]),
+            "is_recovered" : False
+        }
+    except KeyError:
+        filteredPayload = {
+            "message_id" : -1,
+            "device_id" : rawPayload["end_device_ids"]["device_id"],
+            "app_id" : rawPayload["end_device_ids"]["application_ids"]["application_id"],
+            "timestamp" : formatTimestamp(rawPayload["received_at"][:-4]),
+            "type" : 1,
+            "payload" : [],
+            "raw_payload" : "",
+            "spreading_factor" : int(rawPayload["uplink_message"]["settings"]["data_rate"]["lora"]["spreading_factor"]),
+            "is_recovered" : False
+        }
+    # try:
+    #     arrayPayload = binascii.a2b_base64(rawPayload["data"])
+    #     filteredPayload = {
+    #         "message_id" : arrayPayload[0],
+    #         "device_id" : rawPayload["deviceName"],
+    #         "app_id" : rawPayload["applicationName"],
+    #         "timestamp" : formatTimestamp(rawPayload["rxInfo"]["time"][:-1]),
+    #         "type" : int(rawPayload["fPort"]),
+    #         "payload" : arrayPayload,
+    #         "raw_payload" : rawPayload["data"],
+    #         "spreading_factor" : int(rawPayload["txInfo"]["loRaModulationInfo"]["spreadingFactor"]),
+    #         "is_recovered" : False
+    #     }
+    # except KeyError:
+    #     filteredPayload = {
+    #         "message_id" : -1,
+    #         "device_id" : rawPayload["deviceName"],
+    #         "app_id" : rawPayload["applicationName"],
+    #         "timestamp" : formatTimestamp(rawPayload["rxInfo"]["time"][:-1]),
+    #         "type" : 1,
+    #         "payload" : [],
+    #         "raw_payload" : "",
+    #         "spreading_factor" : int(rawPayload["txInfo"]["loRaModulationInfo"]["spreadingFactor"]),
+    #         "is_recovered" : False
+    #     }
     debug("Uplink : for " + filteredPayload["device_id"] + " -> filtered : " + str(filteredPayload))
     return filteredPayload
 
@@ -117,12 +173,6 @@ def parsePayload(message):
     debug("Uplink : for " + message["device_id"] + " -> decoded payload " + str(payload))
     return payload    
 
-def configAllDevices():
-    devices = getDeviceIds()
-    for device in devices:
-        if(devicesStates[device] != CONFIGURED):
-            configDevice(device)
-
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
     debug("Connected to ttn mqtt")
@@ -135,30 +185,29 @@ def on_connect(client, userdata, flags, rc):
             topicRendered = template.render(username=getMqttCredentials()[0],device=device,topic=topic)
             client.subscribe(topicRendered,0)
             debug("Subscribing to topic : " + topicRendered)
-    configAllDevices()
+        stateMachine(device,SERVER_CONFIG_EVENT,None)
 
-def formatMsg(msg):
-    formattedMsg = json.loads(msg)
-    formattedMsg = filterInfo(formattedMsg)
+def formatMsg(message_mqtt:dict):
+    formattedMsg = filterInfo(message_mqtt)
     formattedMsg["payload"] = parsePayload(formattedMsg)
     return formattedMsg
 
-def storeRecoveryLoss(nbRecovery,nbLoss,message):
+def storeRecoveryLoss(nbRecovery:int,nbLoss:int,message:dict):
     p = influxdb_client.Point(message["device_id"] + "@" + message["app_id"]+":network-health-rec-los")
     p = p.field("nb_loss",nbLoss)
     p = p.field("nb_recovery",nbRecovery)
-    influxdbWriteApi.write(bucker=INFLUXDB_BUCKET,org=influxdbOrg,record=p)
+    influxdbWriteApi.write(bucket=INFLUXDB_BUCKET,org=influxdbOrg,record=p)
     
     debug("Storing : for " + message["device_id"] + " -> rec_los " + str(nbRecovery) + " | " + str(nbLoss))
     
-def storeSpreadingFactor(message):
+def storeSpreadingFactor(message:dict):
     p = influxdb_client.Point(message["device_id"] + "@" + message["app_id"]+":network-health-sf")
     p = p.field("spreading_factor", message["spreading_factor"])
-    influxdbWriteApi.write(bucker=INFLUXDB_BUCKET,org=influxdbOrg,record=p)
+    influxdbWriteApi.write(bucket=INFLUXDB_BUCKET,org=influxdbOrg,record=p)
     
     debug("Storing : for " + message["device_id"] + " -> sf " + str(message["spreading_factor"]))
 
-def storeMessage(message):
+def storeMessage(message:dict):
     p = influxdb_client.Point(message["device_id"] + "@" + message["app_id"])
     if(message["is_recovered"]):
         p = p.tag("recovery","true")
@@ -168,12 +217,12 @@ def storeMessage(message):
     for data in message["payload"].keys():
         p = p.field(data, message["payload"][data])
 
-    p = p.time(message["timestamp"])
+    p = p.time(int(message["timestamp"]))
     influxdbWriteApi.write(bucket=INFLUXDB_BUCKET,org=influxdbOrg,record=p)
     
     debug("Storing : for " + message["device_id"] + " -> message " + str(message))
 
-def storePreviousMessage(message,config):
+def storePreviousMessage(message:dict,config:dict):
     if(config["data_recovery"] == -1):
         return
     
@@ -198,18 +247,18 @@ def xorPayload(a,b):
     return xor
 
 def recoverMessage(message,id,missingIndex,config):
-    xorMsg = message["raw_payload"]
+    xorMsg = binascii.a2b_base64(message["raw_payload"])
     xorServ = []
     for i in range(1,config["data_recovery"]):
-        xor = xorPayload(xor,previousMessages[message["device_id"]][i][1])
+        xorServ = xorPayload(xorServ,binascii.a2b_base64(previousMessages[message["device_id"]][i][1]))
     recoveredPayload = xorPayload(xorMsg,xorServ)
     timestamp = 0
     if(missingIndex == 1):
-        timestamp = previousMessages[2][2]
-        timestamp += config["data_interval"]*1000000*60 #add minute from previous message
+        timestamp = previousMessages[message["device_id"]][2][2]
+        timestamp += config["data_interval"]*1000000000*60 #add minute from previous message
     else:
-        timestamp = previousMessages[missingIndex-1][2]
-        timestamp -= config["data_interval"]*1000000*60 #add minute from previous message
+        timestamp = previousMessages[message["device_id"]][missingIndex-1][2]
+        timestamp -= config["data_interval"]*1000000000*60 #add minute from previous message
     recoveredMessage = {
         "message_id" : id,
         "device_id" : message["device_id"],
@@ -227,11 +276,13 @@ def recoverMessage(message,id,missingIndex,config):
     
     return recoveredMessage
 
-def handleRecover(message,config):
+def handleRecover(message:dict,config:dict):
     if(config["data_recovery"] == -1):
+        debug("Unable to recover : for " + message["device_id"] + " -> reason no recovery mode")
         return
 
-    if(len(previousMessages[message["device_id"]]) != config["data_recovery"]+1):
+    if(len(previousMessages[message["device_id"]]) < config["data_recovery"]):
+        debug("Unable to recover : for " + message["device_id"] + " -> reason not enough messages in memory.")
         return 
     
     recoveryId = message["message_id"]
@@ -239,33 +290,93 @@ def handleRecover(message,config):
     previousNum = recoveryId
     missingId = 0
     missingIndex = 0
-    for i in range(1, config["data_recovery"]+1):
-        jump = (previousNum - previousMessages[i][0]) % 256 
+    for i in range(1, config["data_recovery"]):
+        jump = (previousNum - previousMessages[message["device_id"]][i][0]) % 256 
         if(jump > 1):
-            nbJumps += jump
+            nbJumps += jump-1
             missingId = previousMessages[message["device_id"]][i][0] + 1
             missingIndex = i
         previousNum = previousMessages[message["device_id"]][i][0]
     if(nbJumps != 1):
-        debug("Unable to recover : for " + message["device_id"] + " -> reason " + str(nbJumps) + "missing messages")
+        debug("Unable to recover : for " + message["device_id"] + " -> reason " + str(nbJumps) + " missing messages")
         return
     recoveredMessage = recoverMessage(message,missingId,missingIndex,config)
     storeMessage(recoveredMessage)
-    storeRecoveryLoss(0,1,recoveredMessage)
+    storeRecoveryLoss(1,0,recoveredMessage)
 
-def handleMessage(message,topic):
-    if(topic == UP):
-        message = formatMsg(message)
-        if(devicesStates[message["device_id"]] != CONFIGURED):
-            debug("Ignore Message : for " + message["device_id"] + " -> state " + str(devicesStates[message["device_id"]]))
-            return #ignore message
+def stateMachine(device,event,message):
+    try:
+        state = devicesStates[device]
+        if(event == USER_CONFIG_EVENT):
+            devicesStates[device] = NOT_CONFIGURED
+            configDevice(device)
+        elif(event == SERVER_CONFIG_EVENT):
+            if(state in [CONFIGURED,JUST_CONFIGURED]):
+                debug("Ignore Config : for " + device + " -> state " + str(state))
+            elif(state in [NOT_CONFIGURED,WAITING_ACK]):
+                devicesStates[device] = NOT_CONFIGURED
+                configDevice(device)
+        elif(event == MQTT_PUBLISH_EVENT):
+            if(state == NOT_CONFIGURED):
+                devicesStates[device] = WAITING_ACK
+        elif(event == MQTT_ACK_EVENT):
+            if(state == WAITING_ACK):
+                devicesStates[device] = JUST_CONFIGURED
+        elif(event == BOARD_DATA_EVENT):
+            handleUplink(formatMsg(message))
+            if(state == JUST_CONFIGURED):
+                devicesStates[device] = CONFIGURED
+        elif(event == BOARD_RECOVERY_EVENT):
+            if(state == JUST_CONFIGURED):
+                devicesStates[device] = CONFIGURED
+                handleUplink(formatMsg(message))
+            elif(state == CONFIGURED):
+                handleUplink(formatMsg(message))
+                pass
+            else:
+                debug("Ignore Recovery Message : for " + device + " -> state " + str(state))
+        elif(event == BOARD_REQUEST_CONFIG_EVENT):
+            if(state == WAITING_ACK):
+                debug("Ignore Request Config Message : for " + device + " -> state " + str(state))
+            elif(state == JUST_CONFIGURED):
+                debug("Ignore Request Config Message : for " + device + " -> state " + str(state))
+                devicesStates[device] = CONFIGURED
+            else:
+                devicesStates[device] = NOT_CONFIGURED
+                configDevice(device)
         else:
-            handleUplink(message)
-    elif(topic == DOWN_ACK):
-        device = getEndDevice(message)
-        if(devicesStates[device] == WAITING_ACK):
-            devicesStates[device] == CONFIGURED
-            debug("Update : for " + message["device_id"] + " -> devicesStates " + str(devicesStates))
+            debug("Unkown Event : for " + device)
+        debug("Update : for " + device + " | from state " + str(state) + " with event " + str(event) + " to state " + str(devicesStates[device]))
+    except KeyboardInterrupt:
+        raise KeyboardInterrupt
+    except Exception as e:
+        print(e)
+        debug("State machine failed : resetting state machine for device")
+        devicesStates[device] = NOT_CONFIGURED
+        configDevice(device)
+# def handleMessage(message,topic):
+#     pass
+    # if(topic == UP):
+    #     message = formatMsg(message)
+    #     type = message["type"]
+    #     state = devicesStates[message["device_id"]]
+    #     if(state == WAITING_ACK or (state == NOT_CONFIGURED and type != REQUEST_CONFIG)):
+    #         debug("Ignore Message : for " + message["device_id"] + " -> state " + str(state))
+    #         return #ignore message
+    #     if(state == JUST_CONFIGURED and type == REQUEST_CONFIG):
+    #         devicesStates[message["device_id"]] = CONFIGURED
+    #         debug("Update : for " + message["device_id"] + " -> devicesStates " + str(devicesStates))
+    #         return
+    #     elif(message["type"] == REQUEST_CONFIG):
+    #         debug("Uplink : for " + message["device_id"] + " -> message " + str(message))
+    #         configDevice(message["device_id"])
+    #     else:
+    #         handleUplink(message)
+    # elif(topic == DOWN_ACK):
+    #     device = getEndDevice(message)
+    #     if(devicesStates[device] == WAITING_ACK):
+    #         devicesStates[device] = JUST_CONFIGURED
+    #         debug("Update : for " + device + " -> devicesStates " + str(devicesStates))
 
 def handleUplink(message):
     debug("Uplink : for " + message["device_id"] + " -> message " + str(message))
@@ -278,9 +389,9 @@ def handleUplink(message):
         debug("Update : for " + message["device_id"] + " -> previousMessages " + str(previousMessages))
 
     if(len(previousMessages[message["device_id"]])!=0):
-        saut = (int(message["message_id"]) - previousMessages[message["message_id"]][0][0])%256
+        saut = (int(message["message_id"]) - previousMessages[message["device_id"]][0][0])%256
         if(saut > 1):
-            storeRecoveryLoss(saut-1,0,message)
+            storeRecoveryLoss(0,saut-1,message)
     storePreviousMessage(message,config)
     storeSpreadingFactor(message)
     previousSpreadingFactor[message["device_id"]] = message["spreading_factor"]
@@ -292,14 +403,12 @@ def handleUplink(message):
         storeMessage(message)
     elif(message["type"] in [CONCENTRATION_REC,UNIT_REC,BOTH_REC]):
         handleRecover(message, config)
-    elif(message["type"] == REQUEST_CONFIG):
-        configDevice[message["device_id"]]
     return
 
 def topicOf(topic):
     if(topic[-2:] == "up"):
         return UP
-    elif(topic[-9:] == "down/nack"):
+    elif(topic[-8:] == "down/ack"):
         return DOWN_ACK
 
 # The callback for when a PUBLISH message is received from the server.
@@ -307,7 +416,23 @@ def on_message(client, userdata, msg):
     debug("Message recieved from MQTT :\nTopic : " + str(msg.topic) + "\nMsg : " + str(msg.payload) + "\n\n\n")
     
     topic = topicOf(str(msg.topic))
-    handleMessage(msg.payload.decode("utf-8"),topic)
+    messageJson = json.loads(msg.payload.decode("utf-8"))
+    device = getEndDevice(messageJson)
+    event = UNKNOWN_EVENT
+    if(topic == UP):
+        try:
+            port = getPort(messageJson)
+            if(port in [CONCENTRATION,UNIT,BOTH]):
+                event = BOARD_DATA_EVENT
+            elif(port in [CONCENTRATION_REC,UNIT_REC,BOTH_REC]):
+                event = BOARD_RECOVERY_EVENT
+        except(KeyError):
+            event = BOARD_REQUEST_CONFIG_EVENT
+    elif(topic == DOWN_ACK):
+        event = MQTT_ACK_EVENT
+    stateMachine(device,event,messageJson)
+
+
 
 def formDownlinkPayload(config):
     payload = bytearray()
@@ -321,8 +446,6 @@ def formDownlinkPayload(config):
 
 def configDevice(device_id):
     debug("Reconfigure : for " + device_id)
-    devicesStates[device_id] = NOT_CONFIGURED
-    debug("Update : for " + device_id + " -> devicesStates " + str(devicesStates))
     previousMessages[device_id] = []
     payloadbase64 = formDownlinkPayload(getDeviceConfig())
     downlink = {
@@ -332,18 +455,22 @@ def configDevice(device_id):
         "confirmed": True,
         "correlation_ids": [device_id]
     }]}
+    # downlink = {
+        # "confirmed": True,
+        # "fPort": 1,
+        # "data": payloadbase64,
+    # }
     payloadjson = str(json.dumps(downlink))
     template = Template(DOWNLINK_TOPIC_TEMPLATE)
     topic = template.render(username = getMqttCredentials()[0],device=device_id)
     debug("Publishing : for " + device_id + " -> topic " + topic + " payload " + str(payloadjson))
-    messageInfo = mqttBrokerClient.publish(topic, payload=payloadjson, qos=0, retain=False)
+    messageInfo = mqttBrokerClient.publish(topic, payload=payloadjson, qos=2, retain=False)
     publishTracker[messageInfo.mid] = device_id
 
 def on_publish(client, userdata, mid):
     device_id = publishTracker[mid]
-    devicesStates[device_id] = WAITING_ACK
     publishTracker.pop(mid)
-    debug("Update : for " + device_id + " -> devicesStates " + str(devicesStates))
+    stateMachine(device_id,MQTT_PUBLISH_EVENT,None)
 
 def on_disconnect(client, userdata, rc):
     debug("MQTT disconnected")
@@ -379,7 +506,9 @@ def handleDeviceConfig(data):
             data["sf"+str(i)]["data_recovery"] = -1
     setDeviceConfig(data)
     debug("Update : config " + str(data))
-    configAllDevices()
+    devices = getDeviceIds()
+    for device in devices:
+        stateMachine(device,USER_CONFIG_EVENT,None)
 
 def handleAppConfig(data):
     setMqttCredentials(data["username"],data["api-key"])
@@ -408,7 +537,7 @@ def handleAddDevice(data):
             topicRendered = template.render(username=getMqttCredentials()[0],device=device,topic=topic)
             mqttBrokerClient.subscribe(topicRendered,0)
             debug("Subscribing to topic : " + topicRendered)
-        configDevice(device)
+        stateMachine(device,USER_CONFIG_EVENT,None)
         return True
 
 def handleRemoveDevice(data):
@@ -416,6 +545,7 @@ def handleRemoveDevice(data):
     device = data['end-device']
     devices.remove(device)
     setDeviceIds(devices)
+
     debug("Update : devices ids " + str(devices))
     template = Template(UPLINK_TOPIC_TEMPLATE)
     for topic in UPLINK_TOPICS:
@@ -477,8 +607,16 @@ class DownlinkServer(SimpleHTTPRequestHandler):
             self.send_header("Content-type", "text/html")
             self.end_headers()
             self.wfile.write(bytes(msg,"utf-8"))
+        elif(self.path[13:] == "configpage.html"):
+            template = env.get_template(self.path[13:])
+            config = getDeviceConfig()
+            msg = template.render(config=config,sf=previousSpreadingFactor)
+            self.send_response(200)
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            self.wfile.write(bytes(msg,"utf-8"))
         else :
-            self.path = '/templates/' + self.path[13:]
+            self.path = '/root/' + self.path[13:]
             return SimpleHTTPRequestHandler.do_GET(self)
 
 def runHttpServer(server_class=HTTPServer, handler_class=DownlinkServer):

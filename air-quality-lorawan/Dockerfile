@@ -8,4 +8,4 @@ WORKDIR /app
 
 RUN pip3 install paho-mqtt influxdb-client jinja2
 
-CMD ["python3","/app/main.py"]
+CMD ["python3","-u","/app/main.py"]

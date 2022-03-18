@@ -138,8 +138,8 @@ function checkAllFilled() {
     for(let i = 7; i <= 12; i++) {
         let data_type = document.getElementById("data_type_sf" + i);
         let data_interval = document.getElementById("data_interval_sf" + i);
-        let recovery_interval = document.getElementById("recover_interval_sf" + i);
-        if(data_type.value == -1 || data_interval == -1 || recovery_interval == -1){
+        let recovery_interval = document.getElementById("recovery_interval_sf" + i);
+        if(data_type.value == -1 || data_interval.value == -1 || recovery_interval.value == -1){
             return false;
         }
     }
