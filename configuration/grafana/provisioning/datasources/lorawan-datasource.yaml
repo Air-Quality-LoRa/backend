@@ -15,7 +15,7 @@ datasources:
       token: $CUSTOM_INFLUXDB_TOKEN
     jsonData:
       version: Flux
-      # organization: $CUSTOM_INFLUXDB_ORG
-      # defaultBucket: $CUSTOM_INFLUXDB_BUCKET
+      organization: $CUSTOM_INFLUXDB_ORG
+      defaultBucket: $CUSTOM_INFLUXDB_BUCKET
       tlsSkipVerify: false
 

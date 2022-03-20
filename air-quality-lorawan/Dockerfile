@@ -4,7 +4,7 @@ FROM python:3.8
 
 WORKDIR /app
 
-# COPY ./ /app/
+COPY ./ /app/
 
 RUN pip3 install paho-mqtt influxdb-client jinja2
 

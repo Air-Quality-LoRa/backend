@@ -3,28 +3,72 @@ version: "2"
 services:
 
   influxdb:
-    extends:
-      file: influxdb.yml
-      service: influxdb
+    image: influxdb
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${ADMIN_PASSWORD}
+      DOCKER_INFLUXDB_INIT_ORG: ${INFLUX_ORG}
+      DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUX_BUCKET}
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUX_TOKEN}
 
+    volumes:
+      - ./data/influxdb:/var/lib/influxdb2
+      # - ./configuration/influxdb/config:/etc/influxdb2
+    ports:
+      - 8086:8086 #8086 HTTP API port
+    restart: unless-stopped
+
+# http://docs.grafana.org/installation/docker/
   grafana:
-    extends:
-      file: grafana.yml
-      service: grafana
+    image: grafana/grafana-oss
+    user : '1000'
+    environment:
+      GF_SERVER_DOMAIN: ${GRAPHANA_DOMAIN}
+      CUSTOM_SECURITY_ADMIN_USERNAME: "admin"
+      GF_SECURITY_ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      CUSTOM_INFLUXDB_ORG: ${INFLUX_ORG}
+      CUSTOM_INFLUXDB_TOKEN: ${INFLUX_TOKEN}
+      CUSTOM_INFLUXDB_BUCKET: ${INFLUX_BUCKET}
+      GF_DASHBOARDS_JSON_ENABLED: "true"
+      GF_DASHBOARDS_JSON_PATH: /etc/grafana/provisioning/dashboards
+      # GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource,grafana-worldmap-panel,grafana-piechart-panel,mtanda-heatmap-epoch-panel,briangann-gauge-panel,jdbranham-diagram-panel,snuids-radar-panel,fatcloud-windrose-panel,snuids-trafficlights-panel,larona-epict-panel,grafana-polystat-panel,natel-plotly-panel,bessler-pictureit-panel,pierosavi-imageit-panel,agenty-flowcharting-panel,abhisant-druid-datasource,https://github.com/gapitio/gapit-htmlgraphics-panel/releases/download/v2.0.2/gapit-htmlgraphics-panel-2.0.2.zip;gapit-htmlgraphics-panel,https://github.com/cloudspout/cloudspout-button-panel/releases/download/7.0.23/cloudspout-button-panel.zip;cloudspout-button-panel
+      GF_INSTALL_PLUGINS: grafana-clock-panel
+    volumes:
+      - ./data/grafana/grafana.db:/var/lib/grafana/grafana.db
+      - ./configuration/grafana/provisioning:/etc/grafana/provisioning
+    # ports:
+    #   - 3000:3000
+    restart: unless-stopped
     depends_on:
       - influxdb
 
   python-backend:
-    extends:
-      file: python-backend.yml
-      service: python-backend
+    build:
+      context: ./air-quality-lorawan
+    image: python:3.8
+    environment:
+      INFLUXDB_ADDRESS: influxdb
+      INFLUXDB_PORT: 8086
+      INFLUXDB_USERNAME: admin
+      INFLUXDB_TOKEN: ${INFLUX_TOKEN}
+      INFLUXDB_ORG: ${INFLUX_ORG}
+      INFLUXDB_BUCKET: ${INFLUX_BUCKET}
+    volumes:
+      - ./configuration/python-backend/:/app/config
+      - ./air-quality-lorawan:/app #for developpement
+    restart: unless-stopped
     depends_on:
       - influxdb
 
   nginx:
-    extends:
-      file: nginx.yml
-      service: nginx
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - ${HTTP_HOST_PORT}:80
+    volumes:
+      - ./configuration/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./configuration/nginx/.htpasswd:/etc/nginx/.htpasswd
     depends_on:
-     - python-backend
-     - grafana
+    - python-backend
+    - grafana

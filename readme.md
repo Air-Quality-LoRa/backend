@@ -16,20 +16,19 @@ and then interactively type a password.
 
 
 ### Change the credentials
-Change the information in the `.env` file.
+Change the information in the `.env` file as you like
 
+### Create the persistent folders and files
+```
+mkdir -p data/{grafana,influxdb}
+touch data/grafana/grafana.db
+```
 
 ### Start the server
 Start everything with 
 ```
 docker-compose up --build -d
 ```
-
-## Persistant data
-The persistant data is located in two folders:
-- `configuration`
-- `influx-data`
-When you transfer the server, transfer these two folders to the new server.
 
 ## Update the server
 ```
@@ -38,3 +37,9 @@ docker-compose pull
 docker-compose up --force-recreate --build -d
 docker image prune -f #optional, to free space
 ```
+
+# Persistant data
+The persistant data is located in two folders:
+- `configuration`
+- `data`
+When you transfer the server, transfer these two folders to the new server.
