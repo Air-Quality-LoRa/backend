@@ -1,0 +1,309 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "iteration": 1648653616899,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P951FEA4DE68E13C5"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 0
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.3.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "query": "from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}:network-health-rec-los\" and r._field == \"nb_loss\")\n    |> sum()",
+          "refId": "A"
+        }
+      ],
+      "title": "Nombre de paquet perdus (7 derniers jours)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P951FEA4DE68E13C5"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 20
+              },
+              {
+                "color": "yellow",
+                "value": 40
+              },
+              {
+                "color": "#57ccf2",
+                "value": 60
+              },
+              {
+                "color": "green",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "%"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "8.3.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "query": "from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}:network-health-rec-los\")\n    |> sum()\n    |> pivot(rowKey: [\"_measurement\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n    |> map(fn: (r) => ({r with\n            _value: if r.nb_loss == 0 or not exists r.nb_loss then \n                0.0\n            else \n                float(v: r.nb_recovery) / float(v: r.nb_loss) * 100.0\n        }),\n    )\n    |> drop(columns: [\"nb_loss\",\"nb_recovery\"])\n    ",
+          "refId": "A"
+        }
+      ],
+      "title": "Pourcentage de paquet récupérés",
+      "transformations": [],
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P951FEA4DE68E13C5"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 12,
+          "min": 7,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 6.5
+              },
+              {
+                "color": "#38e6eb",
+                "value": 7.5
+              },
+              {
+                "color": "yellow",
+                "value": 8.5
+              },
+              {
+                "color": "#EF843C",
+                "value": 9.5
+              },
+              {
+                "color": "#E24D42",
+                "value": 10.5
+              },
+              {
+                "color": "dark-purple",
+                "value": 11.5
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "8.3.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "query": "from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}:network-health-sf\" and r._field == \"spreading_factor\")\n",
+          "refId": "A"
+        }
+      ],
+      "title": "Dernier Spreading Factor",
+      "type": "gauge"
+    }
+  ],
+  "refresh": "1m",
+  "schemaVersion": 34,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "6f047dfca4697d90",
+          "value": "6f047dfca4697d90"
+        },
+        "hide": 0,
+        "label": "Nom de la carte",
+        "name": "deviceName",
+        "options": [
+          {
+            "selected": true,
+            "text": "6f047dfca4697d90",
+            "value": "6f047dfca4697d90"
+          }
+        ],
+        "query": "6f047dfca4697d90",
+        "skipUrlSync": false,
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "220",
+          "value": "220"
+        },
+        "hide": 0,
+        "label": "Nom d'application",
+        "name": "appName",
+        "options": [
+          {
+            "selected": true,
+            "text": "220",
+            "value": "220"
+          }
+        ],
+        "query": "220",
+        "skipUrlSync": false,
+        "type": "textbox"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Network Health 1",
+  "uid": "_lb1u0Enz",
+  "version": 3,
+  "weekStart": ""
+}

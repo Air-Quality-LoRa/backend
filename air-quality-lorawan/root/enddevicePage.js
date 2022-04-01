@@ -1,7 +1,8 @@
 function sendIdentifier() {
+    let appid = document.getElementById("appid").value;
     let username = document.getElementById("username").value;
-    let apiKey = document.getElementById("api-key").value;
-    let data = {"username" : username, "api-key" : apiKey}
+    let apiKey = document.getElementById("pwd").value;
+    let data = {"appid" : appid, "username" : username, "api-key" : apiKey}
     fetch(url="/api-backend/config_app",{
         method: 'POST',
         headers: {

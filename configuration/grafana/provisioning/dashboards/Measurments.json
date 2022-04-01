@@ -1,0 +1,1340 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "iteration": 1648648720120,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 16,
+      "panels": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 20,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineStyle": {
+                  "fill": "solid"
+                },
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "u/dL"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 12,
+            "x": 0,
+            "y": 1
+          },
+          "id": 30,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P951FEA4DE68E13C5"
+              },
+              "query": "t1 = from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}\" and r._field == \"q_pms_0_3\")\nt2 = from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}\" and r._field == \"q_pms_0_5\")\nt3 = from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}\" and r._field == \"q_pms_1_0\")\nt4 = from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}\" and r._field == \"q_pms_2_5\")\nt5 = from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}\" and r._field == \"q_pms_5_0\")\nt6 = from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}\" and r._field == \"q_pms_10\")\nunion(tables: [t1,t2,t3,t4,t5,t6])",
+              "refId": "Concentration particule 1.0"
+            }
+          ],
+          "title": "Quantités avec les valeurs récupérées",
+          "transformations": [
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Quantité particules 0.3",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "q_pms_0_3 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}",
+                    "q_pms_0_3 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}"
+                  ],
+                  "reducer": "max"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Quantité particules 0.5",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "q_pms_0_5 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}",
+                    "q_pms_0_5 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}"
+                  ],
+                  "reducer": "max"
+                },
+                "replaceFields": false
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Quantité particules 1.0",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "q_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}",
+                    "q_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}"
+                  ],
+                  "reducer": "max"
+                },
+                "replaceFields": false
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Quantité particules 2.5",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "q_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}",
+                    "q_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}"
+                  ],
+                  "reducer": "max"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Quantité particules 5.0",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "q_pms_5_0 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}",
+                    "q_pms_5_0 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}"
+                  ],
+                  "reducer": "max"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Quantité particules 10",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "q_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}",
+                    "q_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}"
+                  ],
+                  "reducer": "max"
+                }
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "c_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": true,
+                  "c_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": true,
+                  "c_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": true,
+                  "c_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": true,
+                  "c_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": true,
+                  "c_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": true,
+                  "q_pms_0_3 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": true,
+                  "q_pms_0_3 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": true,
+                  "q_pms_0_5 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": true,
+                  "q_pms_0_5 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": true,
+                  "q_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": true,
+                  "q_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": true,
+                  "q_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": true,
+                  "q_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": true,
+                  "q_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": true,
+                  "q_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": true,
+                  "q_pms_5_0 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": true,
+                  "q_pms_5_0 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": true
+                },
+                "indexByName": {
+                  "Concentration Particule 1.0": 7,
+                  "Concentration Particule 10": 9,
+                  "Concentration particule 2.5": 8,
+                  "Time": 0,
+                  "c_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": 1,
+                  "c_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": 2,
+                  "c_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": 3,
+                  "c_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": 4,
+                  "c_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": 5,
+                  "c_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": 6
+                },
+                "renameByName": {}
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 20,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineStyle": {
+                  "fill": "solid"
+                },
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "u/dL"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 12,
+            "x": 12,
+            "y": 1
+          },
+          "id": 31,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P951FEA4DE68E13C5"
+              },
+              "query": "t1 = from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}\" and r._field == \"q_pms_0_3\" and r.recovery==\"false\")\nt2 = from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}\" and r._field == \"q_pms_0_5\" and r.recovery==\"false\")\nt3 = from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}\" and r._field == \"q_pms_1_0\" and r.recovery==\"false\")\nt4 = from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}\" and r._field == \"q_pms_2_5\" and r.recovery==\"false\")\nt5 = from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}\" and r._field == \"q_pms_5_0\" and r.recovery==\"false\")\nt6 = from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}\" and r._field == \"q_pms_10\" and r.recovery==\"false\")\nunion(tables: [t1,t2,t3,t4,t5,t6])",
+              "refId": "Concentration particule 1.0"
+            }
+          ],
+          "title": "Quantités sans valeurs récupérées",
+          "transformations": [
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Quantité particules 0.3",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "q_pms_0_3 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}",
+                    "q_pms_0_3 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}"
+                  ],
+                  "reducer": "max"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Quantité particules 0.5",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "q_pms_0_5 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}",
+                    "q_pms_0_5 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}"
+                  ],
+                  "reducer": "max"
+                },
+                "replaceFields": false
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Quantité particules 1.0",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "q_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}",
+                    "q_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}"
+                  ],
+                  "reducer": "max"
+                },
+                "replaceFields": false
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Quantité particules 2.5",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "q_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}",
+                    "q_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}"
+                  ],
+                  "reducer": "max"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Quantité particules 5.0",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "q_pms_5_0 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}",
+                    "q_pms_5_0 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}"
+                  ],
+                  "reducer": "max"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Quantité particules 10",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "q_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}",
+                    "q_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}"
+                  ],
+                  "reducer": "max"
+                }
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "c_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": true,
+                  "c_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": true,
+                  "c_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": true,
+                  "c_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": true,
+                  "c_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": true,
+                  "c_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": true,
+                  "q_pms_0_3 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": true,
+                  "q_pms_0_3 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": true,
+                  "q_pms_0_5 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": true,
+                  "q_pms_0_5 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": true,
+                  "q_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": true,
+                  "q_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": true,
+                  "q_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": true,
+                  "q_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": true,
+                  "q_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": true,
+                  "q_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": true,
+                  "q_pms_5_0 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": true,
+                  "q_pms_5_0 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": true
+                },
+                "indexByName": {
+                  "Concentration Particule 1.0": 7,
+                  "Concentration Particule 10": 9,
+                  "Concentration particule 2.5": 8,
+                  "Time": 0,
+                  "c_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": 1,
+                  "c_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": 2,
+                  "c_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": 3,
+                  "c_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": 4,
+                  "c_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": 5,
+                  "c_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": 6
+                },
+                "renameByName": {}
+              }
+            }
+          ],
+          "type": "timeseries"
+        }
+      ],
+      "title": "Quantité particule fine",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "id": 14,
+      "panels": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 20,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineStyle": {
+                  "fill": "solid"
+                },
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "conμgm3"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 12,
+            "x": 0,
+            "y": 2
+          },
+          "id": 6,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P951FEA4DE68E13C5"
+              },
+              "query": "t1 = from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}\" and r._field == \"c_pms_1_0\")\nt2 = from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}\" and r._field == \"c_pms_2_5\")\nt3 = from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}\" and r._field == \"c_pms_10\")\nunion(tables: [t1,t2,t3])",
+              "refId": "Concentration particule 1.0"
+            }
+          ],
+          "title": "Concentrations avec les valeurs récupérées",
+          "transformations": [
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Concentration Particule 10",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "c_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}",
+                    "c_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}"
+                  ],
+                  "reducer": "max"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Concentration Particule 1.0",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "c_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}",
+                    "c_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}"
+                  ],
+                  "reducer": "max"
+                },
+                "replaceFields": false
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Concentration particule 2.5",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "c_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}",
+                    "c_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}"
+                  ],
+                  "reducer": "max"
+                },
+                "replaceFields": false
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "c_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": true,
+                  "c_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": true,
+                  "c_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": true,
+                  "c_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": true,
+                  "c_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": true,
+                  "c_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": true
+                },
+                "indexByName": {
+                  "Concentration Particule 1.0": 7,
+                  "Concentration Particule 10": 9,
+                  "Concentration particule 2.5": 8,
+                  "Time": 0,
+                  "c_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": 1,
+                  "c_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": 2,
+                  "c_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": 3,
+                  "c_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": 4,
+                  "c_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": 5,
+                  "c_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": 6
+                },
+                "renameByName": {}
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 20,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineStyle": {
+                  "fill": "solid"
+                },
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "conμgm3"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 12,
+            "x": 12,
+            "y": 2
+          },
+          "id": 29,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P951FEA4DE68E13C5"
+              },
+              "query": "t1 = from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}\" and r._field == \"c_pms_1_0\" and r.recovery==\"false\")\nt2 = from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}\" and r._field == \"c_pms_2_5\" and r.recovery==\"false\")\nt3 = from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}\" and r._field == \"c_pms_10\" and r.recovery==\"false\")\nunion(tables: [t1,t2,t3])",
+              "refId": "Concentration particule 1.0"
+            }
+          ],
+          "title": "Concentration sans valeurs récupérées",
+          "transformations": [
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Concentration Particule 10",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "c_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}",
+                    "c_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}"
+                  ],
+                  "reducer": "max"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Concentration Particule 1.0",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "c_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}",
+                    "c_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}"
+                  ],
+                  "reducer": "max"
+                },
+                "replaceFields": false
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Concentration particule 2.5",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "c_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}",
+                    "c_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}"
+                  ],
+                  "reducer": "max"
+                },
+                "replaceFields": false
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "c_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": true,
+                  "c_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": true,
+                  "c_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": true,
+                  "c_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": true,
+                  "c_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": true,
+                  "c_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"true\"}": true
+                },
+                "indexByName": {
+                  "Concentration Particule 1.0": 4,
+                  "Concentration Particule 10": 6,
+                  "Concentration particule 2.5": 5,
+                  "Time": 0,
+                  "c_pms_10 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": 1,
+                  "c_pms_1_0 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": 2,
+                  "c_pms_2_5 {name=\"6f047dfca4697d90@220\", recovery=\"false\"}": 3
+                },
+                "renameByName": {}
+              }
+            }
+          ],
+          "type": "timeseries"
+        }
+      ],
+      "title": "Concentration particule fine",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 2
+      },
+      "id": 12,
+      "panels": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 20,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineStyle": {
+                  "fill": "solid"
+                },
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "humidity"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 3
+          },
+          "id": 4,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P951FEA4DE68E13C5"
+              },
+              "query": "from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}\" and r._field == \"humidity\")\n",
+              "refId": "A"
+            }
+          ],
+          "title": "Humidité avec les valeurs récupérées",
+          "transformations": [
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Humidité",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "humidity {name=\"6f047dfca4697d90@220\", recovery=\"false\"}",
+                    "humidity {name=\"6f047dfca4697d90@220\", recovery=\"true\"}"
+                  ],
+                  "reducer": "max"
+                },
+                "replaceFields": true
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 20,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": [
+              {
+                "__systemRef": "hideSeriesFrom",
+                "matcher": {
+                  "id": "byNames",
+                  "options": {
+                    "mode": "exclude",
+                    "names": [
+                      "Température"
+                    ],
+                    "prefix": "All except:",
+                    "readOnly": true
+                  }
+                },
+                "properties": [
+                  {
+                    "id": "custom.hideFrom",
+                    "value": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 3
+          },
+          "id": 2,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P951FEA4DE68E13C5"
+              },
+              "query": "from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}\" and r._field == \"temperature\")\n",
+              "refId": "A"
+            }
+          ],
+          "title": "Température avec les valeurs récupérées",
+          "transformations": [
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Température",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "temperature {name=\"6f047dfca4697d90@220\", recovery=\"false\"}",
+                    "temperature {name=\"6f047dfca4697d90@220\", recovery=\"true\"}"
+                  ],
+                  "reducer": "max"
+                },
+                "replaceFields": true
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 20,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineStyle": {
+                  "fill": "solid"
+                },
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "humidity"
+            },
+            "overrides": [
+              {
+                "__systemRef": "hideSeriesFrom",
+                "matcher": {
+                  "id": "byNames",
+                  "options": {
+                    "mode": "exclude",
+                    "names": [
+                      "Humidité"
+                    ],
+                    "prefix": "All except:",
+                    "readOnly": true
+                  }
+                },
+                "properties": [
+                  {
+                    "id": "custom.hideFrom",
+                    "value": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 11
+          },
+          "id": 32,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P951FEA4DE68E13C5"
+              },
+              "query": "from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}\" and r._field == \"humidity\" and r.recovery==\"false\")\n",
+              "refId": "A"
+            }
+          ],
+          "title": "Humidité sans valeurs récupérées",
+          "transformations": [
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Humidité",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "humidity false"
+                  ],
+                  "reducer": "max"
+                },
+                "replaceFields": true
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 20,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": [
+              {
+                "__systemRef": "hideSeriesFrom",
+                "matcher": {
+                  "id": "byNames",
+                  "options": {
+                    "mode": "exclude",
+                    "names": [
+                      "Température"
+                    ],
+                    "prefix": "All except:",
+                    "readOnly": true
+                  }
+                },
+                "properties": [
+                  {
+                    "id": "custom.hideFrom",
+                    "value": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 11
+          },
+          "id": 33,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P951FEA4DE68E13C5"
+              },
+              "query": "from(bucket: \"air-quality\")\n    |> range(start: -7d)\n    |> filter(fn: (r) => r._measurement == \"${deviceName}@${appName}\" and r._field == \"temperature\" and r.recovery==\"false\")\n",
+              "refId": "A"
+            }
+          ],
+          "title": "Température sans valeurs récupérées",
+          "transformations": [
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Température",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "temperature false"
+                  ],
+                  "reducer": "max"
+                },
+                "replaceFields": true
+              }
+            }
+          ],
+          "type": "timeseries"
+        }
+      ],
+      "title": "Température et Humidité",
+      "type": "row"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 34,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "6f047dfca4697d90",
+          "value": "6f047dfca4697d90"
+        },
+        "description": "",
+        "hide": 0,
+        "label": "Nom de la carte",
+        "name": "deviceName",
+        "options": [
+          {
+            "selected": true,
+            "text": "6f047dfca4697d90",
+            "value": "6f047dfca4697d90"
+          }
+        ],
+        "query": "\t6f047dfca4697d90",
+        "skipUrlSync": false,
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "220",
+          "value": "220"
+        },
+        "hide": 0,
+        "label": "Nom d'application",
+        "name": "appName",
+        "options": [
+          {
+            "selected": true,
+            "text": "220",
+            "value": "220"
+          }
+        ],
+        "query": "220",
+        "skipUrlSync": false,
+        "type": "textbox"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Mesure Carte 1",
+  "uid": "ZVA6l0Enk",
+  "version": 8,
+  "weekStart": ""
+}

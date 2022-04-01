@@ -1,19 +1,23 @@
 <head>
     <meta charset="utf-8">
     <script type="text/javascript" src="enddevicePage.js"></script>
+    <link href="enddevicePage.css" rel="stylesheet">
 </head>
 <html>
     <div id="identifiers">
-        <label>Nom d'organisation TTN</label>
+        <label>Application ID</label>
+        <input id="appid" type="text" value="{{appid-}}"/>
+        <label>MQTT Username</label>
         <input id="username" type="text" value="{{username-}}"/>
-        <label>Clé d'API</label>
-        <input id="api-key" type="text" value="{{api_key-}}"/>
-        <button onclick="sendIdentifier()">Mettre à jour</button>
+        <label>MQTT Password</label>
+        <input id="pwd" type="text" value="{{pwd-}}"/>
+        <button id="sendIdentifier" onclick="sendIdentifier()">Update</button>
     </div>
+    <hr/>
     <div id="adding-device">
         <label>End device id</label>
         <input id="end-device-id" type="text"/>
-        <button onclick="addEndDevice()">Ajouter l'end device</button>
+        <button id="addEndDevice" onclick="addEndDevice()">Ajouter l'end device</button>
         <p id="duplicate-error" hidden="true">Cet end device est déjà dans la liste</p>
     </div>
     <div >

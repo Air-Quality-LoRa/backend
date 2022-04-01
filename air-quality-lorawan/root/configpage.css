@@ -4,15 +4,22 @@
 }
 
 select {
-    margin:10px
+    margin-left:10px;
+    margin-right:10px;
 }
 
 #sendButton {
+    margin-top:10px;
     background-color: green;
     color:white;
     border: none;
     width:100px;
     height: 50px;
+    border-radius: 10px;
+}
+
+#sendButton:hover {
+    background-color: rgb(0, 63, 0);
 }
 
 img {
@@ -23,3 +30,10 @@ img {
     color:red;
     font-weight: bold;
 }
+
+html {
+    background-color: #181b1f;
+    color: rgb(204,204,204);
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+}
+    
