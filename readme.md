@@ -10,10 +10,11 @@ Install `apache2-utils` to generate a `.htpasswd` file.
 
 Run 
 ```
-htpasswd -c configuration/nginx/.htpasswd USERNAME
+htpasswd -c configuration/nginx/.htpasswd admin
 ``` 
 and then interactively type a password.
 
+This pasword will be asked on the configuration pages. 
 
 ### Change the credentials
 Change the information in the `.env` file as you like
@@ -42,4 +43,4 @@ docker image prune -f #optional, to free space
 The persistant data is located in two folders:
 - `configuration`
 - `data`
-When you transfer the server, transfer these two folders to the new server.
+When you transfer the server, transfer these two folders to the new machine to keep all the data.
